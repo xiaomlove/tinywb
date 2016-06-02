@@ -19,10 +19,6 @@ final class App implements \ArrayAccess
     
 	public static function run(array $config)
 	{
-        if (version_compare(PHP_VERSION, '5.5.0', '<')) {
-            die('最低需要PHP 5.5.0 !');
-        }
-        
         
 	}
 
