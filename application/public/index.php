@@ -15,10 +15,10 @@ define('APP_PATH', dirname(__DIR__));
 $config = require APP_PATH . '/configs/main.php';
 
 //引入框架启动文件
-require dirname(APP_PATH) . '/framework/App.php';
+require dirname(APP_PATH) . '/framework/Bootstrap.php';
 
 //运行应用运行
-framework\App::run($config);
+App::run($config);
 
 
 

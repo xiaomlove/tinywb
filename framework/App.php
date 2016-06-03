@@ -12,8 +12,8 @@ final class App implements \ArrayAccess
     private static function initExceptionHandler()
     {
         if (defined('APP_DEBUG') && APP_DEBUG === true ) {
-            set_exception_handler(array(AppException::class, 'default_exception_handler'));
-            register_shutdown_function(array(AppException::class, 'error_exception_handler'));
+            set_exception_handler([AppException::class, 'default_exception_handler']);
+            register_shutdown_function([AppException::class, 'error_exception_handler']);
         }
     }
     

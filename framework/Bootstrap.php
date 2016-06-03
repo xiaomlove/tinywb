@@ -13,7 +13,7 @@ if (version_compare(PHP_VERSION, '5.5.0', '<')) {
 
 require 'Autoload.php';
 
-spl_autoload_register(array(Autoload::class, 'load'));
+spl_autoload_register([new Autoload, 'load']);
 
 App::start();
 
