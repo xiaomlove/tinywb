@@ -3,23 +3,22 @@ namespace framework;
 
 use framework\traits\ArrayAccess;
 use framework\traits\FinalSingleton;
-use framework\exceptions\AppException;
+use framework\exceptions\AppExceptionHandler;
 
 final class App implements \ArrayAccess
 {
     use ArrayAccess, FinalSingleton;
     
-    private static function initExceptionHandler()
-    {
-        if (defined('APP_DEBUG') && APP_DEBUG === true ) {
-            set_exception_handler([AppException::class, 'default_exception_handler']);
-            register_shutdown_function([AppException::class, 'error_exception_handler']);
-        }
-    }
-    
 	public static function run(array $config)
 	{
+        Config::init($config);
         
+        AppExceptionHandler::register();
+        
+        $request = Request::getInstance();
+        
+        echo $request->method = 9;
 	}
+	
 
 }

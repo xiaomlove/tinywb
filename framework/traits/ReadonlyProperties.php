@@ -10,15 +10,13 @@ trait ReadonlyProperties
 	{
 		if (property_exists($this, $name)) {
 			if (in_array($name, $this->readonlyProperties)) {
-				trigger_error('属性只读');
-				return false;
+				throw new \Exception("propertity '$name' is readonly.");
 			} else {
 				$this->name = $value;
 				return true;
 			}
 		} else {
-			trigger_error("不存在该属：$name");
-			return false;
+			throw new \OutOfBoundsException("properity '$name' is not exists.");
 		}
 		
 	}
@@ -28,7 +26,7 @@ trait ReadonlyProperties
 		if (in_array($name, $this->readonlyProperties)) {
 			return $this->$name;
 		} else {
-			trigger_error("不存在该属：$name");
+			throw new \OutOfBoundsException("properity '$name' is not exists.");
 		}
 	}
 }

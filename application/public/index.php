@@ -18,7 +18,7 @@ $config = require APP_PATH . '/configs/main.php';
 require dirname(APP_PATH) . '/framework/Bootstrap.php';
 
 //运行应用运行
-App::run($config);
+framework\App::run($config);
 
 
 
