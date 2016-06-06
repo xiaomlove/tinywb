@@ -16,7 +16,8 @@ final class App
         
         $request = Request::getInstance();
         
-        new SB;
+        dump($request->ss);
+        
 	}
 	
 
