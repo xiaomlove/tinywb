@@ -11,7 +11,10 @@
     <link href="//cdn.bootcss.com/tether/1.3.2/css/tether.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/prettify/r298/prettify.min.css" rel="stylesheet">
     <style>
-        .code li {line-height: 10px}
+      .lang-php {margin: 0;border: none !important;}
+      .code-ol {font-size: 0; background-color: blanchedalmond;margin: 0;}
+      .code-ol li {font-size: 14px;background-color:gainsboro}
+      li.highlight {background-color: lightcoral}
     </style>
   </head>
   <body>
@@ -22,7 +25,7 @@
     	<h1><?php echo $errMessage?></h1>
     	<br/>
     	<pre class="prettyprint lang-php">
-    		<ol start="<?php echo $errStartLine?>" class="code">
+    		<ol start="<?php echo $errStartLine?>" class="code-ol">
     		<?php foreach ($errSourceCode as $key => $value):?>
     		  <li class="line-<?php echo $errStartLine + $key?>"><?php echo $value?></li>
     		<?php endforeach?>
@@ -122,9 +125,11 @@
     <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
     <script src="//cdn.bootcss.com/tether/1.3.2/js/tether.min.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
-<!--     <script src="//cdn.bootcss.com/prettify/r298/prettify.min.js"></script> -->
+     <script src="//cdn.bootcss.com/prettify/r298/prettify.min.js"></script> 
     <script type="text/javascript">
     prettyPrint();
+    var line = '<?php echo $errline?>';
+    $('.line-' + line).addClass('highlight');
     </script>
   </body>
 </html>

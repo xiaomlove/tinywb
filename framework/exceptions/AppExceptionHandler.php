@@ -88,9 +88,9 @@ class AppExceptionHandler
     private static function output($errno, $type, $file, $line, $message, $stack = '')
     {
         $codeArr = file($file, FILE_IGNORE_NEW_LINES);
-        $start = max(0, $line - 10);
-        $end = min(count($codeArr) - 1, $line + 10);
-        $codeArr = array_slice($codeArr, $start, 20);
+        $start = max(0, $line - 11);//前边10行
+        $end = min(count($codeArr) - 1, $line + 10);//后边10行
+        $codeArr = array_slice($codeArr, $start, $end - $start);
 //         dump($codeArr);die;
         $html = View::render(__DIR__ . '/tpl_exception.php', [
             'errcode' => $errno,
