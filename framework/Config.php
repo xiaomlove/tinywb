@@ -8,11 +8,11 @@
 
 namespace framework;
 
-use framework\traits\FinalSingleton;
+use framework\traits\Singleton;
 
 class Config
 {
-    use FinalSingleton;
+    use Singleton;
     
     private static $isInitialized = false;//是否初始化
     
@@ -45,7 +45,7 @@ class Config
     {
         if (is_null($key)) {
             return self::$configs;
-        }elseif (empty($key) || !is_string($key)) {
+        } elseif (empty($key) || !is_string($key)) {
             throw new \InvalidArgumentException("parameter key must be a not empty string");
             return false;
         } else {

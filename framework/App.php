@@ -1,23 +1,22 @@
 <?php
 namespace framework;
 
-use framework\traits\ArrayAccess;
-use framework\traits\FinalSingleton;
+use framework\traits\Singleton;
 use framework\exceptions\AppExceptionHandler;
 
-final class App implements \ArrayAccess
+final class App 
 {
-    use ArrayAccess, FinalSingleton;
+    use Singleton;
     
 	public static function run(array $config)
 	{
         Config::init($config);
-        
+            
         AppExceptionHandler::register();
         
         $request = Request::getInstance();
         
-        echo $request->method = 9;
+        new SB;
 	}
 	
 

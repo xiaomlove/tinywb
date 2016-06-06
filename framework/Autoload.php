@@ -8,13 +8,13 @@
 
 namespace framework;
 
-use framework\traits\FinalSingleton;
+use framework\traits\Singleton;
 
-require FRAMEWORK_PATH . '/traits/FinalSingleton.php';
+require __DIR__ . '/traits/Singleton.php';
 
 class Autoload
 {
-    use FinalSingleton;
+    use Singleton;
     
     /**
      * 是否已经注册

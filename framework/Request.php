@@ -9,11 +9,11 @@
 namespace framework;
 
 use framework\traits\ReadonlyProperties;
-use framework\traits\FinalSingleton;
+use framework\traits\Singleton;
 
 class Request
 {
-	use FinalSingleton, ReadonlyProperties;
+	use Singleton, ReadonlyProperties;
 
 	private $server;//$_SERVER
 	
@@ -167,9 +167,9 @@ class Request
 	
 	public function getServerIp()
 	{
-	    if (!empty($_SERVER['HTTP_HOST']))
+	    if (!empty($_SERVER['SERVER_ADDR']))
 	    {
-	        return $_SERVER['HTTP_HOST'];
+	        return $_SERVER['SERVER_ADDR'];
 	    } else {
 	        return '';
 	    }

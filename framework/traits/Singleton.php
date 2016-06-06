@@ -1,8 +1,8 @@
 <?php
 /**
-* @desc 单例模式，且为最终类。
-*       如果该为为父类，单例了其子类无法实例化，情况很少
-*       如果该类为子类，更不能私有化其父类的构造函数。故只用于最终类的单例化
+* @desc 单例模式。会将当前类的构造函数私有化。
+*       如果当前类为父类，子类需要显式声明构造函数并将访问级别变弱（weaker）,也就是由private -> protected/public，才能实例化。
+*       如果当前类为子类，其父类不能声明protected/public类的构造函数，要么不声明，要么声明privated。
 * @author xiaomlove
 * @link http://xiaomlove.com
 * @time 2016年6月3日    上午12:03:55
@@ -10,7 +10,7 @@
 
 namespace framework\traits;
 
-trait FinalSingleton
+trait Singleton
 {
     private static $instance;
     

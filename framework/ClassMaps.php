@@ -9,6 +9,6 @@
 namespace framework;
 
 return [
-    'framework\App' => FRAMEWORK_PATH . '/App.php',
-    'framework\traits\ArrayAccess' => FRAMEWORK_PATH . '/traits/ArrayAccess.php',
+    'framework\App' => __DIR__ . '/App.php',
+    'framework\traits\ArrayAccess' => __DIR__ . '/traits/ArrayAccess.php',
 ];

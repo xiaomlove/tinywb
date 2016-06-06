@@ -38,6 +38,10 @@ class AppExceptionHandler
      */
     public static function register()
     {
+        if (APP_DEGUB) {
+            error_reporting(E_ALL);
+        }
+        
         $useFrameworkExceptionHandler = Config::get('use_framework_exception_handler');
         if ($useFrameworkExceptionHandler) {
             set_exception_handler([__CLASS__, 'defaultExceptionHandler']);//不能私有，必须公开
