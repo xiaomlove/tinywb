@@ -12,4 +12,11 @@ return [
     'use_framework_error_handler' => 1,//是否使用框架的错误处理机制，为0不使用
     
     'method_parameter' => '_method',//浏览器模拟PUT,DELETE等方法时使用参数名
+    
+    //默认提供者
+    'default_providers' => [
+        'framework\providers\RequestProvider',
+        'framework\providers\AppProvider',
+        'framework\providers\ConfigProvider',
+    ],
 ];

@@ -8,6 +8,7 @@
 
 use framework\Config;
 use framework\Request;
+use framework\App;
 
 /**
  * 打印变量
@@ -46,7 +47,21 @@ function config() {
  * 获取客户端IP
  * @return Ambigous <string, unknown>
  */
-function getClientIp()
-{
+function getClientIp() {
     return Request::getInstance()->getClientIp();
+}
+
+/**
+ * 快速获取注入的结果
+ * @param string $key
+ * @return \framework\App|NULL
+ */
+function app($key = null) {
+    if (is_null($key)) {
+        return App::getInstance();
+    } elseif (is_string($key) && !empty($key)) {
+        $app = App::getInstance();
+        return $app[$key];
+    }
+    return null;
 }
