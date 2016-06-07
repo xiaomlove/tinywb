@@ -21,6 +21,14 @@ require dirname(APP_PATH) . '/framework/Bootstrap.php';
 framework\App::run($config);
 
 
+$app = framework\App::getInstance();
+
+$app['request'] = function() {
+    return framework\Request::getInstance();
+};
+
+dump($app['request']);
+
 
 
 

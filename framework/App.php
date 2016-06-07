@@ -4,7 +4,7 @@ namespace framework;
 use framework\traits\Singleton;
 use framework\exceptions\AppExceptionHandler;
 
-final class App 
+final class App extends Container
 {
     use Singleton;
     
@@ -14,9 +14,7 @@ final class App
             
         AppExceptionHandler::register();
         
-        $request = Request::getInstance();
         
-        dump($request->ss);
         
 	}
 	
