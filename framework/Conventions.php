@@ -18,5 +18,6 @@ return [
         'framework\providers\RequestProvider',
         'framework\providers\AppProvider',
         'framework\providers\ConfigProvider',
+        'framework\providers\AutoloadProvider',
     ],
 ];

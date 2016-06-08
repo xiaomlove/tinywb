@@ -19,7 +19,7 @@ final class App extends Container
             }
             $providerObj = new $className($this);
             if (!$providerObj instanceof Provider) {
-                throw new \Exception("class: $className is not instanceof framework\providers\Provider");
+                throw new \Exception("class: $className is not an instanceof framework\providers\Provider");
             }
             $providerObj->register();
         }
@@ -41,7 +41,7 @@ final class App extends Container
             $this->regiserProvider($defaultProviders);
         }
         
-        dump(app());
+        dump(app('autoload'));
         
 	}
 	
