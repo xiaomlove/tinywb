@@ -12,9 +12,12 @@ use framework\Config;
 use framework\View;
 use framework\Request;
 use framework\Response;
+use framework\traits\Singleton;
 
 class AppExceptionHandler
 {
+    use Singleton;
+    
     private static $errLevels = [
         1 => 'E_ERROR',
         2 => 'E_WARNING',
@@ -35,25 +38,29 @@ class AppExceptionHandler
     ];
     /**
      * 注册错误与异常处理机制
+     * 
      */
     public static function register()
     {
-        if (APP_DEGUB) {
+        if (!APP_DEGUB) {
+            error_reporting(0);
+        } else {
             error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            
+            $useFrameworkExceptionHandler = Config::get('use_framework_exception_handler');
+            if ($useFrameworkExceptionHandler) {
+                set_exception_handler([__CLASS__, 'defaultExceptionHandler']);//不能私有，必须公开
+            }
+            
+            $useFrameworkErrorHandler = Config::get('use_framework_error_handler');
+            if ($useFrameworkErrorHandler) {
+                ini_set('display_errors', 0);
+                set_error_handler([__CLASS__, 'errorHandler']);//不能私有，必须公开
+            }
+            $showRunningInfo = Config::get('show_running_info') ? true : false;
+            register_shutdown_function([__CLASS__, 'shutdownFunction'], $showRunningInfo);//不能私有，必须公开
         }
-        
-        $useFrameworkExceptionHandler = Config::get('use_framework_exception_handler');
-        if ($useFrameworkExceptionHandler) {
-            set_exception_handler([__CLASS__, 'defaultExceptionHandler']);//不能私有，必须公开
-        }
-        
-        $useFrameworkErrorHandler = Config::get('use_framework_error_handler');
-        if ($useFrameworkErrorHandler) {
-            ini_set('display_errors', 0);
-            set_error_handler([__CLASS__, 'errorHandler']);//不能私有，必须公开
-            register_shutdown_function([__CLASS__, 'shutdownFunction']);//不能私有，必须公开
-        }
-        
         return true;
     }
     /**
@@ -80,13 +87,16 @@ class AppExceptionHandler
     /**
      * 脚本终止处理函数。
      */
-    public static function shutdownFunction()
+    public static function shutdownFunction($showRunningInfo = false)
     {
        $errInfo = error_get_last();
        if (!empty($errInfo)) {
            //echo "<hr/>shutdownFunction: " . self::$errLevels[$errInfo['type']] . "---{$errInfo['message']}---in file: {$errInfo['file']}--- at line: {$errInfo['line']} </hr>";
            self::output($errInfo['type'], self::$errLevels[$errInfo['type']], $errInfo['file'], $errInfo['line'], $errInfo['message']);
+       } elseif ($showRunningInfo) {
+           //echo View::render(__DIR__ . '/tpl_running_info.php');
        }
+       
     }
     
     private static function output($errno, $type, $file, $line, $message, $stack = '')
@@ -106,17 +116,17 @@ class AppExceptionHandler
             'errMessage' => $message,
             'errStack' => str_replace("\n", '<br/>', $stack),
             'errSourceCode' => $codeArr,
-            'constants' => get_defined_constants(true)['user'],
-            'includedFiles' => get_included_files(),
-            'server' => $_SERVER,
-            'get' => $_GET,
-            'post' => $_POST,
-            'request' => $_REQUEST,
-            'cookie' => $_COOKIE,
-            'time' => microtime(true) - APP_START_TIME,
         ]);
         
         (new Response($html))->send();
+        die;
+    }
+    
+    public function dump($vars)
+    {
+        $html = View::render(__DIR__ . '/tpl_dump.php', ['vars' => $vars]);
+        (new Response($html))->send();
+        die;
     }
 }
 

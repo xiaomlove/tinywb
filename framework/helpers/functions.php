@@ -9,19 +9,29 @@
 use framework\Config;
 use framework\Request;
 use framework\App;
+use framework\exceptions\AppExceptionHandler;
 
 /**
  * 打印变量
  * @param unknown $data
  * @param string $die
  */
-function dump($data, $die = true) {
-    echo '<pre>';
-    var_dump($data);
-    echo '</pre>';
-    if ($die) {
-        die;
+function dump() {
+   $todumps = todump('__dump');
+   $vars = array_merge($todumps, func_get_args());
+   AppExceptionHandler::getInstance()->dump($vars);
+}
+
+/**
+ * 存储待打印的变量
+ * @return multitype:
+ */
+function todump() {
+    static $vars = [];
+    if (func_get_arg(0) === '__dump') {
+        return $vars;
     }
+    $vars = array_merge($vars, func_get_args());
 }
 
 /**

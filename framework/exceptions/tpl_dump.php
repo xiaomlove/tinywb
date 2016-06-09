@@ -19,23 +19,13 @@
   <body>
     <div class="container-fluid">
     <div style="margin: 15px;padding: 10px;border: 1px solid #ddd">
-    	<h2><?php echo sprintf('[%s] %s in file: <code>%s</code> at line: <code>%s</code>', $errcode, $errtype, $errfile, $errline)?></h2>
-    	<br/>
-    	<h1><?php echo $errMessage?></h1>
-    	<br/>
-    	<pre class="prettyprint lang-php">
-    		<ol start="<?php echo $errStartLine?>" class="code-ol">
-    		<?php foreach ($errSourceCode as $key => $value):?>
-    		  <li class="line-<?php echo $errStartLine + $key?>"><?php echo $value?></li>
-    		<?php endforeach?>
-    		</ol>
-    	</pre>
-    	
-    	<h2>Call Stack</h2>
-    	<p>
-    		<?php echo $errStack?>
-    	</p>
-    	
+<?php foreach ($vars as $data):?>
+<pre>
+<?php var_dump($data)?>
+</pre>
+<hr/>
+<?php endforeach;?>
+
     	<?php include 'tpl_common_running_info.php'?>
     </div>
 	</div>
@@ -43,9 +33,5 @@
     <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
     <script src="//cdn.bootcss.com/tether/1.3.2/js/tether.min.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-    var line = '<?php echo $errline?>';
-    $('.line-' + line).addClass('highlight');
-    </script>
   </body>
 </html>

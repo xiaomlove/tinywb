@@ -25,6 +25,8 @@ class Request
 	
 	private $header;
 	
+    /***********************只读属性****************/
+    //请求方式相关
 	private $method;
 
 	private $isGet;
@@ -36,13 +38,22 @@ class Request
 	private $isDelete;
 	
 	private $isAjax;
+	
+	private $isSSL;
+	
+	//请求路由相关
+	private $fullUrl;
+	
+	private $baseUrl;
+	
+	
 
 	public function __construct()
 	{
 		$this->server = &$_SERVER;
 		$this->get = &$_GET;
 		$this->post = &$_POST;
-		$this->param = &$_REQUEST;
+		$this->param = &$_REQUEST;//GET,POST中相同键的值，REQUEST中只有POST的
 		$this->initHeaders();
 		
         $method = $this->method = $this->getMethod();
@@ -51,6 +62,9 @@ class Request
         $this->isPut = $method === 'PUT' ? true : false;
         $this->isDelete = $method === 'DELETE' ? true : false;
         $this->isAjax = $this->isAjax();
+        $this->isSSL = $this->isSSL();
+        
+        $this->fullUrl = $this->getFullUrl();
         
         $this->readonlyProperties = ['method', 'isGet', 'isPost', 'isPut', 'isDelete', 'isAjax'];
 	}
@@ -173,5 +187,22 @@ class Request
 	    } else {
 	        return '';
 	    }
+	}
+	
+	public function isSSL()
+	{
+	    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+	        return true;
+	    }
+	    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+	        return true;
+	    }
+	    return false;
+	}
+	
+	public function getFullUrl()
+	{
+	    $url = $this->isSSL ? 'https://' : 'http://';
+	    return $url . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	}
 }

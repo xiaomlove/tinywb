@@ -6,7 +6,7 @@
 * @time 2016年5月30日    上午1:21:20
 */
 
-ini_set('display_errors', 1);
+//ini_set('display_errors', 1);
 
 //定义应用根目录。遵循PHP中__DIR__，定义路径都不带右/
 define('APP_PATH', dirname(__DIR__));

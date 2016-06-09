@@ -69,7 +69,7 @@ class Autoload
         $this->classMaps = array_merge($this->classMaps, $classMap);
     }
     
-    public function getPrefixes()
+    public function getNamespaces()
     {
         return $this->prefixes;
     }

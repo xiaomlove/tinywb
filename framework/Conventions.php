@@ -13,11 +13,19 @@ return [
     
     'method_parameter' => '_method',//浏览器模拟PUT,DELETE等方法时使用参数名
     
+    //默认命名空间
+    'default_namespaces' => [
+        'controllers' => APP_PATH . '/controllers',
+        'models' => APP_PATH . '/models',
+        'services' => APP_PATH . '/services',
+    ],
+    
     //默认提供者
     'default_providers' => [
         'framework\providers\RequestProvider',
         'framework\providers\AppProvider',
         'framework\providers\ConfigProvider',
         'framework\providers\AutoloadProvider',
+        'framework\providers\routeProvider',
     ],
 ];

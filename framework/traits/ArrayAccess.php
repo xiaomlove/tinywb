@@ -10,7 +10,7 @@ namespace framework\traits;
 
 trait ArrayAccess
 {
-    private  $containers = [];
+    protected  $containers = [];
     
     public function offsetExists($offset)
     {
