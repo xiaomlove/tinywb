@@ -30,6 +30,10 @@ class Autoload
     
     private $classMaps = [];//框架类映射，可以一定程度加快截入速度
     
+    private $filePathMaps = [];//文件路径映射，通过完整类名获取其路径
+    
+    private $loadingClassName = '';//当前正在加载的完整类名    
+    
     public function register()
     {
         if ($this->isRegistered) {
@@ -81,6 +85,7 @@ class Autoload
     
     private function loadClass($className)
     {
+        $this->loadingClassName = $className;
         if (isset($this->classMaps[$className])) {
             return $this->requireFile($this->classMaps[$className]);
         }
@@ -127,9 +132,23 @@ class Autoload
     private function requireFile($file)
     {
         if (file_exists($file)) {
+            $this->filePathMaps[$this->loadingClassName] = $file;
             require $file;
             return true;
         }
         return false;
+    }
+    
+    public function getFilePath($className = null)
+    {
+        if (is_null($className))
+        {
+            return $this->filePathMaps;
+        } elseif (isset($this->filePathMaps[$className])) {
+            return $this->filePathMaps[$className];
+        } else {
+            return '';
+        }
+        
     }
 }

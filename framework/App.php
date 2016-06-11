@@ -3,6 +3,7 @@ namespace framework;
 
 use framework\traits\Singleton;
 use framework\exceptions\AppExceptionHandler;
+use framework\exceptions\RouteNotMatchException;
 use framework\providers\Provider;
 
 final class App extends Container
@@ -62,6 +63,20 @@ final class App extends Container
         return true;
     }
     
+    private function runController($matchedRoute)
+    {
+       
+        $controller = $matchedRoute['map']['controller'];
+        $action = $matchedRoute['map']['action'];
+        $parameters = $this->getActionParameters($controller, $action);
+        foreach ($parameters as $name => &$value) {
+            if (isset($matchedRoute['params'][$name])) {
+                $value = $matchedRoute['params'][$name];
+            }
+        }
+        return call_user_func_array([new $controller, $action], $parameters);
+    }
+    
     
     /*******************************************************************/
     
@@ -79,7 +94,7 @@ final class App extends Container
 	    $this->hadRun = true;
 	    
         Config::init($config);
-            
+        
         AppExceptionHandler::register();
         
         $this->regiserProvider();
@@ -90,13 +105,61 @@ final class App extends Container
         
         $request = app('request');
         $route = app('route');
+        $autoload = app('autoload');
         $routeMaps = $route->getRouteMaps();
+        $routeMapsFlip = $route->getRouteMapsFlip();
         
-        $url = $request->getFullUrl();
+        //dump($this->getProviders());
+        try {
+            $matchedRoute = $route->resolveUrl($request->getFullUrl());
+            $route->setMatchedRoute($matchedRoute);
+        } catch(RouteNotMatchException $e) {
+            $e->output();
+        }
+        todump('__clean');
+        //todump($matchedRoute);
+       
+        $result = $this->runController($matchedRoute);
         
-        //todump($routeMaps);
+        if ($result instanceof Response) {
+            $result->send();
+        } elseif (is_array($result)) {
+            (new Response($result))->send();
+        } elseif (is_scalar($result)) {
+            (new Response((string)$result))->send();
+        } else {
+            throw new \UnexpectedValueException("Not support response type: " . gettype($result));
+        }
         
-        $route->resolveUrl($url);
+	}
+	
+	public function dispatch($controller, $action, array $parameters = [])
+	{
+	    return call_user_func_array([new $controller, $action], $parameters);
+	}
+	
+	public function getActionParameters($className, $methodName)
+	{
+	    $reflectionMethod = new \ReflectionMethod($className, $methodName);
+	    $parameters = $reflectionMethod->getParameters();
+	    if (empty($parameters)) {
+	        return [];
+	    }
+	    $out = [];
+	    foreach ($parameters as $param) {
+	        $paramName = $param->name;
+	        $reflectionParameter = new \ReflectionParameter([$className, $methodName], $paramName);
+	        $dependentClass = $reflectionParameter->getClass();
+	        if (!empty($dependentClass)) {
+	            throw new \UnexpectedValueException("Not support object inject in method parameter: {$dependentClass->name}");
+	        }
+	        if ($reflectionParameter->isDefaultValueAvailable()) {
+	            $out[$paramName] = $reflectionParameter->getDefaultValue();
+	        } else {
+	            $out[$paramName] = '';
+	        }
+	    }
+	    return $out;
 	}
 	
 

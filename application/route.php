@@ -8,8 +8,8 @@
 
 use framework\Route;
 
-Route::get('/', 'controllers\IndexController@index');
-Route::get('user/{id}/{age}.html', 'controllers\UserController@profile', ['id' => '[\d]+']);
-Route::get('user/list', 'controllers\UserController@list');
-Route::get('user/welcome.html', 'controllers\UserController@welcome');
-Route::get('user/{name}', 'controllers\UserController@info');
+Route::get('/', 'controllers\Index@index');
+Route::get('user/{id}/{age}.html', 'controllers\User@profile', ['id' => '[\d]+', 'age' => '[\d]+']);
+Route::get('user/list', 'controllers\User@list');
+Route::get('user/welcome.html', 'controllers\User@welcome');
+Route::get('user/{name}', 'controllers\User@info');

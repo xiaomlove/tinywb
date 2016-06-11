@@ -8,7 +8,7 @@
 
 namespace framework;
 
-defined('APP_DEBUG') or define('APP_DEGUB', true);
+defined('APP_DEBUG') or define('APP_DEBUG', true);
 
 define('FRAMEWORK_PATH', __DIR__);
 

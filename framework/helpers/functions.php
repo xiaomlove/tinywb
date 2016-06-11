@@ -28,8 +28,11 @@ function dump() {
  */
 function todump() {
     static $vars = [];
-    if (func_get_arg(0) === '__dump') {
+    $action = func_get_arg(0);
+    if ($action === '__dump') {
         return $vars;
+    } elseif ($action === '__clean') {
+       return $vars = [];
     }
     $vars = array_merge($vars, func_get_args());
 }

@@ -42,7 +42,7 @@ class AppExceptionHandler
      */
     public static function register()
     {
-        if (!APP_DEGUB) {
+        if (!APP_DEBUG) {
             error_reporting(0);
         } else {
             error_reporting(E_ALL);
@@ -70,6 +70,7 @@ class AppExceptionHandler
     {
 //         echo "<hr>Exception---" . get_class($e) . ": " . $e->getCode() . ", " . $e->getMessage() . "<br/>" .  str_replace("\n", "<br/>", $e->getTraceAsString()) . "</hr>";
 //         die;
+//         echo '-----bbbbbbbbbbbbb';
         self::output($e->getCode(), get_class($e), $e->getFile(), $e->getLine(), $e->getMessage(), $e->getTraceAsString());
     }
     
@@ -81,6 +82,7 @@ class AppExceptionHandler
 //         $outStr = self::$errLevels[$errno] . ": {$errstr}---in file: {$errfile}---at line: {$errline}";
 //         echo "<hr/>Error---$outStr<hr/>";
 //         die;
+//         echo '------ccccccccccccccccc';
         self::output($errno, self::$errLevels[$errno], $errfile, $errline, $errstr);
     }
     
@@ -92,6 +94,7 @@ class AppExceptionHandler
        $errInfo = error_get_last();
        if (!empty($errInfo)) {
            //echo "<hr/>shutdownFunction: " . self::$errLevels[$errInfo['type']] . "---{$errInfo['message']}---in file: {$errInfo['file']}--- at line: {$errInfo['line']} </hr>";
+//            echo '-------------ddddddddddddddddddddd';
            self::output($errInfo['type'], self::$errLevels[$errInfo['type']], $errInfo['file'], $errInfo['line'], $errInfo['message']);
        } elseif ($showRunningInfo) {
            //echo View::render(__DIR__ . '/tpl_running_info.php');
@@ -106,7 +109,7 @@ class AppExceptionHandler
         $end = min(count($codeArr) - 1, $line + 10);//后边10行
         $codeArr = array_slice($codeArr, $start, $end - $start);
 //         dump($codeArr);die;
-        $html = View::render(__DIR__ . '/tpl_exception.php', [
+        $html = View::getInstance()->render(__DIR__ . '/tpl_exception.php', [
             'errcode' => $errno,
             'errtype' => $type,
             'errfile' => $file,
@@ -119,14 +122,12 @@ class AppExceptionHandler
         ]);
         
         (new Response($html))->send();
-        die;
     }
     
     public function dump($vars)
     {
-        $html = View::render(__DIR__ . '/tpl_dump.php', ['vars' => $vars]);
+        $html = View::getInstance()->render(__DIR__ . '/tpl_dump.php', ['vars' => $vars]);
         (new Response($html))->send();
-        die;
     }
 }
 

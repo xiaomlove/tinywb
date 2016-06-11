@@ -171,7 +171,7 @@ class Response
        
         //symfony里边还看ob_get_status(true)有几层，再清理。这里都到脚本结尾了，有意义？
         
-        return true;
+        die;
     }
     
     

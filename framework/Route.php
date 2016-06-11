@@ -3,6 +3,7 @@
 namespace framework;
 
 use framework\traits\Singleton;
+use framework\exceptions\RouteNotMatchException;
 
 class Route
 {
@@ -14,8 +15,10 @@ class Route
     
     private static $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
     
+    private $matchedRoute;
+    
    /**
-    * options中的键是url中变量，值是验证（框架自带验证类）。如果键是middleware，则是进行中间件验证
+    * options中是对$url中参数的正则验证规则
     * @param unknown $url
     * @param unknown $controllerAction
     * @param unknown $options
@@ -70,6 +73,19 @@ class Route
         return ['url' => $url, 'level' => $level];
     }
     
+    private static function injectParams(array $params = [])
+    {
+        //URL上的参数，肯定是注入GET
+        foreach ($params as $name => $value) {
+            $_GET[$name] = $value;
+            if (!isset($_REQUEST[$name])) {
+                //REQUST是以POST为准
+                $_REQUEST[$name] = $value;
+            }
+        }
+        return true;    
+    }
+    
     public function getRouteMaps()
     {
         return self::$routeMaps;
@@ -80,11 +96,19 @@ class Route
         return self::$routeMapsFlip;
     }
     
+    
+    
+    /**
+     * 解析一个URL，返回路由表中匹配的项
+     * @param unknown $url
+     * @throws RouteNotMatchException
+     * @return multitype:string multitype: number unknown NULL
+     */
     public function resolveUrl($url)
     {
         $urlPath = parse_url($url, PHP_URL_PATH);
         if (empty($urlPath)) {
-            throw new \InvalidArgumentException("Invalid url: $url.");
+            throw new RouteNotMatchException("Invalid URL, " . print_r($urlPath, true), $url);
         }
         $request = Request::getInstance();
         $urlAndLevel = self::getUrlAndLevel($urlPath);
@@ -92,15 +116,15 @@ class Route
         $level = $urlAndLevel['level'];
         $method = $request->getMethod();
         if (empty(self::$routeMaps[$method][$level])) {
-            return null;
+            throw new RouteNotMatchException("No route match, method: '$method', level: $level", $url);
         }
         $maps = self::$routeMaps[$method][$level];
         todump($maps);
         todump($urlPath);
         //dump();
         
-        $matched = ['map' => '', 'params' => [], 'index' => 0, 'total' => count($maps)];
-        foreach ($maps as $k => $map) {
+        $matched = ['map' => '', 'method' => $method, 'params' => [], 'index' => 0, 'total' => count($maps)];
+        foreach ($maps as $k => &$map) {
             if ($map['url'] === $urlPath) {
                 //直接等了，就是它了
                 $matched['map'] = $map;
@@ -113,6 +137,7 @@ class Route
             //todump($matches);
             if (empty($paramsNum)) {
                 //又不直接等，又没有参数，不可能，跳过
+                $map['reason'] = "not equal no param, '$mapUrl'   not match   '$pattern'";
                 continue;
             }
             $params = [];//参数数组
@@ -131,6 +156,7 @@ class Route
             $resultNum = preg_match($mapUrl, $urlPath, $resultMatches);
             if ($resultNum === 0) {
                 //没戏
+                $map['reason'] = "'$urlPath' not match '$mapUrl'";
                 continue;
             }
             $matched['map'] = $map;
@@ -139,9 +165,27 @@ class Route
             break;
         }
         if (empty($matched['map'])) {
-            
+            throw new RouteNotMatchException("can not match the URL from registered routes", $url, $urlPath, $maps);
         }
+        return $matched;
     }
     
+    /**
+     * 返回当前请求匹配的路由
+     */
+    public function getMatchedRoute()
+    {
+        return $this->matchedRoute;
+    }
+    
+    public function setMatchedRoute($route)
+    {
+        if (empty($this->matchedRoute)) {
+            $this->matchedRoute = $route;
+            return true;
+        } else {
+            return false;
+        }
+    }
     
 }

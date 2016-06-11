@@ -11,7 +11,11 @@ return [
 
     'use_framework_error_handler' => 1,//是否使用框架的错误处理机制，为0不使用
     
-    'method_parameter' => '_method',//浏览器模拟PUT,DELETE等方法时使用参数名
+    'default_method_parameter' => '_method',//默认浏览器模拟PUT,DELETE等方法时使用参数名
+    
+    'default_view_path' => APP_PATH . '/views',//默认视图目录
+    
+    'default_layout_path' => APP_PATH . '/views/layouts',//默认布局文件目录
     
     //默认命名空间
     'default_namespaces' => [
