@@ -3,7 +3,7 @@ namespace framework\providers;
 
 use framework\Route;
 
-class routeProvider extends Provider
+class RouteProvider extends Provider
 {
     public function register()
     {
