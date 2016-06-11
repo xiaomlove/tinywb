@@ -30,6 +30,6 @@ return [
         'framework\providers\AppProvider',
         'framework\providers\ConfigProvider',
         'framework\providers\AutoloadProvider',
-        'framework\providers\routeProvider',
+        'framework\providers\RouteProvider',
     ],
 ];
