@@ -2,16 +2,25 @@
 namespace framework;
 
 use framework\traits\Singleton;
+use framework\traits\ReadonlyProperties;
 use framework\exceptions\AppExceptionHandler;
 use framework\exceptions\RouteNotMatchException;
 use framework\providers\Provider;
 
 final class App extends Container
 {
-    use Singleton;
+    use Singleton, ReadonlyProperties;
     
     private $hadRun = false;
     
+    private $controller;
+    
+    private $action;
+    
+    public function __construct()
+    {
+        $this->readonlyProperties = ['controller', 'action'];
+    }    
     /**
      * 注册提供者
      * @throws \RuntimeException
@@ -65,16 +74,23 @@ final class App extends Container
     
     private function runController($matchedRoute)
     {
-       
-        $controller = $matchedRoute['map']['controller'];
-        $action = $matchedRoute['map']['action'];
+        $controller = $this->controller;
+        $action = $this->action;
         $parameters = $this->getActionParameters($controller, $action);
         foreach ($parameters as $name => &$value) {
             if (isset($matchedRoute['params'][$name])) {
                 $value = $matchedRoute['params'][$name];
             }
         }
-        return call_user_func_array([new $controller, $action], $parameters);
+        $controllerObj = new $controller;
+        
+        //在action执行之前，做些什么？
+        
+        $controllerResult = call_user_func_array([$controllerObj, $action], $parameters);
+        
+        //运行远action之后，做些什么？
+        
+        return $controllerResult;
     }
     
     
@@ -113,12 +129,17 @@ final class App extends Container
         try {
             $matchedRoute = $route->resolveUrl($request->getFullUrl());
             $route->setMatchedRoute($matchedRoute);
+            $this->controller = $matchedRoute['map']['controller'];
+            $this->action = $matchedRoute['map']['action'];
         } catch(RouteNotMatchException $e) {
             $e->output();
         }
         todump('__clean');
         //todump($matchedRoute);
        
+        //在实例化控制器之前，有个启动文件会引入，里边的代码都会被执行？
+        
+        
         $result = $this->runController($matchedRoute);
         
         if ($result instanceof Response) {
