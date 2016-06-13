@@ -7,5 +7,11 @@ return [
 	'namespaces' => [],
     
     //提供者，填写提供者完整类名
-    'providers' => []
+    'providers' => [],
+    
+    'db' => [
+        'dsn' => 'mysql:dbname=test;host=127.0.0.1;', 
+        'user' => 'root', 
+        'password' => '123456'
+    ],
 ];
