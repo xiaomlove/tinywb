@@ -8,6 +8,7 @@
 
 namespace framework\exceptions;
 
+use framework\App;
 use framework\View;
 use framework\Response;
 
@@ -32,7 +33,7 @@ class RouteNotMatchException extends \Exception
     
     public function output()
     {
-        $statusCode = APP_DEBUG ? 200 : 404;
+        $statusCode = App::getInstance()->isDebug ? 200 : 404;
         $html = View::getInstance()->render(__DIR__ . '/tpl_route_not_match.php', [
             'message' => $this->message,
             'fullUrl' => $this->fullUrl,

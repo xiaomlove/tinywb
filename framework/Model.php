@@ -26,5 +26,25 @@ class Model
         $this->policy = $policy;
     }
     
+    public function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    {
+        return $this->getDb()->fetch($sql, $binds, $fetcyStyle);
+    }
+    
+    public function fetchAll($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    {
+        return $this->getDb()->fetchAll($sql, $binds, $fetcyStyle);
+    }
+    
+    public function fetchColumn($sql, array $binds = [])
+    {
+        return $this->getDb()->fetchColumn($sql, $binds);
+    }
+    
+    public function lastSql()
+    {
+        return $this->getDb()->lastSql();
+    }
+    
     
 }

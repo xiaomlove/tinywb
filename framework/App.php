@@ -17,9 +17,11 @@ final class App extends Container
     
     private $action;
     
+    private $isDebug;
+    
     public function __construct()
     {
-        $this->readonlyProperties = ['controller', 'action'];
+        $this->readonlyProperties = ['controller', 'action', 'isDebug'];
     }    
     /**
      * 注册提供者
@@ -101,7 +103,6 @@ final class App extends Container
         return $this->containers;
     }
     
-    
 	public function run(array $config)
 	{
 	    if ($this->hadRun) {
@@ -110,6 +111,8 @@ final class App extends Container
 	    $this->hadRun = true;
 	    
         Config::init($config);
+        
+        $this->isDebug = (bool)Config::get('app_debug');
         
         AppExceptionHandler::register();
         
@@ -136,9 +139,11 @@ final class App extends Container
         }
         todump('__clean');
         //todump($matchedRoute);
+        
+        //解析完URL，才方便定义框架常量。这些常量主要是给框架使用者使用，框架本身不能依靠之，框架是提供这些常量
+        require(__DIR__ . '/Constants.php');
        
         //在实例化控制器之前，有个启动文件会引入，里边的代码都会被执行？
-        
         
         $result = $this->runController($matchedRoute);
         

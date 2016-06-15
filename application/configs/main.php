@@ -1,6 +1,6 @@
 <?php
 
-return [
+$config = [
     'show_running_info' => true,//展示运行信息
     
     //命名空间，名称 => 路径
@@ -17,3 +17,5 @@ return [
         ],
     ],
 ];
+
+return array_merge($config, require(dirname(__DIR__) . '/config-local.php'));

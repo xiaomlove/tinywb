@@ -10,6 +10,10 @@ class Mysql implements DbInterface
     private $pdo;
     
     private $stat;
+    
+    private $lastSql;
+    
+    private $allSql = [];
 
     private static $attributes = [
         "AUTOCOMMIT", "ERRMODE", "CASE", "CLIENT_VERSION", "CONNECTION_STATUS",
@@ -29,8 +33,9 @@ class Mysql implements DbInterface
         $password = empty($pocily['password']) ? '' : $pocily['password'];
         try {
             $this->pdo = new \PDO($dsn, $user, $password, [
-                \PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_TIMEOUT=>1,
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_TIMEOUT => 1,
+                \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
             ]);
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
@@ -78,9 +83,12 @@ class Mysql implements DbInterface
      * @param unknown $sql
      * @param array $binds
     */
-    public function fetch($sql, array $binds = [])
+    public function fetch($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
-
+        $this->collectSql($sql, $binds);
+        $stat = $this->pdo->prepare($sql);
+        $stat->execute($binds);
+        return $stat->fetch($fetchStyle);
     }
     
     /**
@@ -88,9 +96,12 @@ class Mysql implements DbInterface
      * @param unknown $sql
      * @param array $binds
     */
-    public function fetchAll($sql, array $binds = [])
+    public function fetchAll($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
-
+        $this->collectSql($sql, $binds);
+        $stat = $this->pdo->prepare($sql);
+        $stat->execute($binds);
+        return $stat->fetchAll($fetchStyle);
     }
     
     /**
@@ -100,7 +111,10 @@ class Mysql implements DbInterface
     */
     public function fetchColumn($sql, array $binds = [])
     {
-
+        $this->collectSql($sql, $binds);
+        $stat = $this->pdo->prepare($sql);
+        $stat->execute($binds);
+        return $stat->fetchColumn();
     }
     
     
@@ -149,7 +163,7 @@ class Mysql implements DbInterface
     */
     public function lastSql()
     {
-
+        return $this->lastSql;
     }
     
     /**
@@ -174,5 +188,17 @@ class Mysql implements DbInterface
     public function rollBack()
     {
 
+    }
+    
+    private function collectSql($sql, array $binds)
+    {
+        $sql .= ' ---binds: ';
+        foreach ($binds as $name => $value) {
+            $sql .= "$name => $value, ";
+        }
+        $sql = rtrim($sql, ', ');
+        
+        $this->lastSql = $sql;
+        $this->allSql[] = $sql;
     }
 }

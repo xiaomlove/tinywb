@@ -7,7 +7,6 @@
 */
 
 use framework\Config;
-use framework\Request;
 use framework\App;
 use framework\exceptions\AppExceptionHandler;
 
@@ -54,14 +53,6 @@ function config() {
         default:
             return false;
     }
-}
-
-/**
- * 获取客户端IP
- * @return Ambigous <string, unknown>
- */
-function getClientIp() {
-    return Request::getInstance()->getClientIp();
 }
 
 /**

@@ -6,8 +6,6 @@
 * @time 2016年5月30日    上午1:21:20
 */
 
-//define('APP_DEBUG', false);
-
 //定义应用根目录。遵循PHP中__DIR__，定义路径都不带右/
 define('APP_PATH', dirname(__DIR__));
 

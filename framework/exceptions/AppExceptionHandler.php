@@ -8,6 +8,7 @@
 
 namespace framework\exceptions;
 
+use framework\App;
 use framework\Config;
 use framework\View;
 use framework\Request;
@@ -42,7 +43,7 @@ class AppExceptionHandler
      */
     public static function register()
     {
-        if (!APP_DEBUG) {
+        if (!App::getInstance()->isDebug) {
             error_reporting(0);
         } else {
             error_reporting(E_ALL);

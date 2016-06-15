@@ -23,7 +23,7 @@ class Config
         if (self::$isInitialized) {
             return false;
         }
-        $conventionsConfig = require(FRAMEWORK_PATH . '/Conventions.php');
+        $conventionsConfig = require(__DIR__ . '/Conventions.php');
         $config = array_merge($conventionsConfig, $config);
         self::$configs = $config;
         self::$isInitialized = true;

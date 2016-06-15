@@ -8,11 +8,4 @@
 
 namespace framework;
 
-defined('APP_DEBUG') or define('APP_DEBUG', true);
-
 define('FRAMEWORK_PATH', __DIR__);
-
-define('APP_START_TIME', microtime(true));
-
-
-
