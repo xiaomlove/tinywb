@@ -41,9 +41,25 @@ class Model
         return $this->getDb()->fetchColumn($sql, $binds);
     }
     
+    /**
+     * 插入数据
+     * @param string $table 数据表名称 ，如test
+     * @param array $fields 字段数组， 一维数组，如['name', 'age', 'sex']
+     * @param array $datas  值数组，二维数组，如[['小明', 21, '男'], ['小红', 18, '女']]
+     */
+    public function insert($table, array $fields, array $datas)
+    {
+        return $this->getDb()->insert($table, $fields, $datas);
+    }
+    
     public function lastSql()
     {
         return $this->getDb()->lastSql();
+    }
+    
+    public function allSql()
+    {
+        return $this->getDb()->allSql();
     }
     
     

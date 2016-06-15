@@ -35,12 +35,13 @@ interface DbInterface
     public function fetchColumn($sql, array $binds = []);
 
     
-    /**
-     * 插入数据
-     * @param unknown $table
-     * @param array $arrSets
-     */
-    public function insert($table, array $arrSets);
+   /**
+    * 插入数据
+    * @param string $table
+    * @param array $fields
+    * @param array $datas
+    */
+    public function insert($table, array $fields, array $datas);
     
     
     /**

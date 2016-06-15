@@ -26,7 +26,7 @@ class Mysql implements DbInterface
             throw new \RuntimeException('class \PDO is not exists.');
         }
         if (empty($pocily['dsn'])) {
-            throw new \RuntimeException('no set pocily.dsh: ' . print_r($pocily, true));
+            throw new \RuntimeException('no set pocily.dsn: ' . print_r($pocily, true));
         }
         $dsn = $pocily['dsn'];
         $user = empty($pocily['user']) ? '' : $pocily['user'];
@@ -120,12 +120,18 @@ class Mysql implements DbInterface
     
     /**
      * 插入数据
-     * @param unknown $table
-     * @param array $arrSets
-    */
-    public function insert($table, array $arrSets)
+     * @param string $table 数据表名称 ，如test
+     * @param array $fields 字段数组， 一维数组，如['name', 'age', 'sex']
+     * @param array $datas  值数组，二维数组，如[['小明', 21, '男'], ['小红', 18, '女']]
+     */
+    public function insert($table, array $fields, array $datas)
     {
-
+        $sql = "INSERT INTO $table SET " . implode('=?,', $fields);
+        $sql = rtrim($sql, ',');
+        $stat = $this->pdo->prepare($sql);
+        foreach ($datas as $data) {
+            
+        }
     }
     
     
