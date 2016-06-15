@@ -4,6 +4,7 @@ namespace controllers;
 use framework\Controller;
 
 use framework\View;
+use framework\Model;
 
 class Index extends Controller
 {
@@ -14,6 +15,9 @@ class Index extends Controller
         $res = "controller is: " . __CLASS__;
         $res .= " and action is: " . __FUNCTION__;
 //         echo 'ssss';
+        $model = new Model;
+        dump($model->getDb()->getAttribute());
+
         return $this->display('index/index.php', ['info' => $res]);
     }
 }

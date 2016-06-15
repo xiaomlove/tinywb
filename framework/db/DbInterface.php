@@ -6,13 +6,6 @@ interface DbInterface
 {
     
     /**
-     * 总的执行所有SQL。
-     * @param unknown $sql
-     * @param array $binds
-     */
-    private function execute($sql, array $binds = []);
-    
-    /**
      * 执行除SELECT外的语句，如UPDATE/DELETE/INSERT
      * @param unknown $sql
      * @param array $binds
@@ -85,6 +78,6 @@ interface DbInterface
     
     public function commit();
     
-    public function rollBask();
+    public function rollBack();
     
 }
