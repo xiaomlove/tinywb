@@ -28,16 +28,12 @@ class Mysql implements DbInterface
         $dsn = $pocily['dsn'];
         $user = empty($pocily['user']) ? '' : $pocily['user'];
         $password = empty($pocily['password']) ? '' : $pocily['password'];
-        try {
-            $this->pdo = new \PDO($dsn, $user, $password, [
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_TIMEOUT => 1,
-                \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
-                \PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
-        } catch (\Exception $e) {
-            throw new \RuntimeException($e->getMessage());
-        }
+        $this->pdo = new \PDO($dsn, $user, $password, [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_TIMEOUT => 1,
+            \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
+            \PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
     }
 
     public function getAttribute($attr = null)
