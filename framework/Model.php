@@ -47,9 +47,9 @@ class Model
      * @param array $fields 字段数组， 一维数组，如['name', 'age', 'sex']
      * @param array $datas  值数组，二维数组，如[['小明', 21, '男'], ['小红', 18, '女']]
      */
-    public function insert($table, array $fields, array $datas)
+    public function insert($table, array $fieldData)
     {
-        return $this->getDb()->insert($table, $fields, $datas);
+        return $this->getDb()->insert($table, $fieldData);
     }
     
     public function lastSql()

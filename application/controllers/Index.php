@@ -19,9 +19,14 @@ class Index extends Controller
         $sql = "SELECT * FROM test1 WHERE 1=:1";
         // $sql = "SELECT count(*) FROM test1 WHERE id>:id";
         // todump($model->fetchColumn($sql, array(':id' => 0)));
-        dump($model->fetch($sql, array(':1' => 1)));
+        //dump($model->fetch($sql, array(':1' => 1)));
 
-        $field = [];
+        $field = [
+            ['name' => '小a', 'title' => 'title a', 'sex' => '男'],
+            ['name' => '小b', 'title' => 'title b', 'sex' => '女'],
+        ];
+        $r = $model->insert('test1', $field);
+        dump($r);
         return $this->display('index/index.php', ['info' => $res]);
     }
 }

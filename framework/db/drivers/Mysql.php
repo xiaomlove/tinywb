@@ -122,15 +122,18 @@ class Mysql implements DbInterface
     /**
      * 插入数据
      * @param string $table 数据表名称 ，如test
-     * @param array $fields 字段数组， 一维数组，如['name', 'age', 'sex']
-     * @param array $datas  值数组，二维数组，如[['小明', 21, '男'], ['小红', 18, '女']]
+     * @param array $fieldData 数据，二维数组，如[
+     *                                          ['name' => '小明', 'age' => 18, 'sex' => '男'],
+     *                                          ['name' => '小红', 'age' => 20, 'sex' => '女'],
+     *                                         ]
      */
-    public function insert($table, array $fields, array $datas)
+    public function insert($table, array $fieldData)
     {
+        $fields = array_keys($fieldData[0]);
         $fieldsStr = implode(',', $fields);
         $fieldCounts = count($fields);
-        $sql = "INSERT INTO $table ($fieldsStr) VALUES " . str_repeat('(' . str_repeat('?', $fieldCounts) . '),');
-        
+        $sql = "INSERT INTO $table ($fieldsStr) VALUES " . ;
+        return $sql;
     }
     
     
@@ -205,5 +208,12 @@ class Mysql implements DbInterface
         
         $this->lastSql = $sql;
         $this->allSql[] = $sql;
+    }
+
+    private function buildPlaceholder(array $fieldData)
+    {
+        $fields = array_keys($fieldData[0]);
+        $fieldsStr = implode(',', $fields);
+        $fieldCounts = count($fields);
     }
 }

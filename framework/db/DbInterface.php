@@ -41,7 +41,7 @@ interface DbInterface
     * @param array $fields
     * @param array $datas
     */
-    public function insert($table, array $fields, array $datas);
+    public function insert($table, array $fieldData);
     
     
     /**
