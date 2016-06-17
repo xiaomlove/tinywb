@@ -36,6 +36,7 @@ class Mysql implements DbInterface
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_TIMEOUT => 1,
                 \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
+                \PDO::ATTR_EMULATE_PREPARES => false,
             ]);
         } catch (\Exception $e) {
             throw new \RuntimeException($e->getMessage());
@@ -126,12 +127,10 @@ class Mysql implements DbInterface
      */
     public function insert($table, array $fields, array $datas)
     {
-        $sql = "INSERT INTO $table SET " . implode('=?,', $fields);
-        $sql = rtrim($sql, ',');
-        $stat = $this->pdo->prepare($sql);
-        foreach ($datas as $data) {
-            
-        }
+        $fieldsStr = implode(',', $fields);
+        $fieldCounts = count($fields);
+        $sql = "INSERT INTO $table ($fieldsStr) VALUES " . str_repeat('(' . str_repeat('?', $fieldCounts) . '),');
+        
     }
     
     
