@@ -6,11 +6,11 @@ interface DbInterface
 {
     
     /**
-     * 执行除SELECT外的语句，如UPDATE/DELETE/INSERT
+     * 执行任意sql语句
      * @param unknown $sql
      * @param array $binds
      */
-    public function exec($sql, array $binds = []);
+    public function execute($sql, array $binds = []);
     
     
     /**
@@ -34,35 +34,6 @@ interface DbInterface
      */
     public function fetchColumn($sql, array $binds = []);
 
-    
-   /**
-    * 插入数据
-    * @param string $table
-    * @param array $fields
-    * @param array $datas
-    */
-    public function insert($table, array $fieldData);
-    
-    
-    /**
-     * 更新数据
-     * @param unknown $table
-     * @param array $arrSets
-     * @param unknown $whereStr
-     */
-    public function update($table, array $arrSets, $whereStr);
-    
-    /**
-     * 删除数据
-     * @param unknown $table
-     * @param unknown $whereStr
-     */
-    public function delete($table, $whereStr);
-    
-    /**
-     * 返回最后插入的ID
-     */
-    public function lastInsertId();
     
     /**
      * 最后执行的SQL语句

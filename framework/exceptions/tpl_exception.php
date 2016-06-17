@@ -23,6 +23,10 @@
     	<br/>
     	<h1><?php echo $errMessage?></h1>
     	<br/>
+    	<?php if (!empty($errSql)):?>
+    	<p><strong>SQL：</strong><?php echo $errSql?></p>
+    	<p><strong>Binds: </strong><?php print_r($errBinds)?></p>
+    	<?php endif;?>
     	<pre class="prettyprint lang-php">
     		<ol start="<?php echo $errStartLine?>" class="code-ol">
     		<?php foreach ($errSourceCode as $key => $value):?>

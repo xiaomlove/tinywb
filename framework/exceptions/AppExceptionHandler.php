@@ -72,7 +72,16 @@ class AppExceptionHandler
 //         echo "<hr>Exception---" . get_class($e) . ": " . $e->getCode() . ", " . $e->getMessage() . "<br/>" .  str_replace("\n", "<br/>", $e->getTraceAsString()) . "</hr>";
 //         die;
 //         echo '-----bbbbbbbbbbbbb';
-        self::output($e->getCode(), get_class($e), $e->getFile(), $e->getLine(), $e->getMessage(), $e->getTraceAsString());
+        self::output(
+            $e->getCode(), 
+            get_class($e), 
+            $e->getFile(), 
+            $e->getLine(), 
+            $e->getMessage(), 
+            $e->getTraceAsString(),
+            method_exists($e, 'getSql') ? $e->getSql() : '',
+            method_exists($e, 'getBinds') ? $e->getBinds() : ''
+        );
     }
     
     /**
@@ -103,7 +112,7 @@ class AppExceptionHandler
        
     }
     
-    private static function output($errno, $type, $file, $line, $message, $stack = '')
+    private static function output($errno, $type, $file, $line, $message, $stack = '', $sql = '', $binds = '')
     {
         $codeArr = file($file, FILE_IGNORE_NEW_LINES);
         $start = max(0, $line - 11);//前边10行
@@ -120,6 +129,8 @@ class AppExceptionHandler
             'errMessage' => $message,
             'errStack' => str_replace("\n", '<br/>', $stack),
             'errSourceCode' => $codeArr,
+            'errSql' => $sql,
+            'errBinds' => $binds,
         ]);
         
         (new Response($html))->send();

@@ -3,13 +3,10 @@
 namespace framework\db\drivers;
 
 use framework\db\DbInterface;
-use framework\Config;
 
 class Mysql implements DbInterface
 {
     private $pdo;
-    
-    private $stat;
     
     private $lastSql;
     
@@ -59,25 +56,17 @@ class Mysql implements DbInterface
     }
     
     /**
-     * 总的执行所有SQL。
+     * 执行任意SQL。
      * @param unknown $sql
      * @param array $binds
      */
     public function execute($sql, array $binds = [])
     {
-
+        $this->collectSql($sql, $binds);
+        $stat = $this->pdo->prepare($sql);
+        $stat->execute($binds);
+        return $stat->rowCount();
     }
-    
-    /**
-     * 执行除SELECT外的语句，如UPDATE/DELETE/INSERT
-     * @param unknown $sql
-     * @param array $binds
-    */
-    public function exec($sql, array $binds = [])
-    {
-
-    }
-    
     
     /**
      * 执行SELECT，获取一行
@@ -120,50 +109,11 @@ class Mysql implements DbInterface
     
     
     /**
-     * 插入数据
-     * @param string $table 数据表名称 ，如test
-     * @param array $fieldData 数据，二维数组，如[
-     *                                          ['name' => '小明', 'age' => 18, 'sex' => '男'],
-     *                                          ['name' => '小红', 'age' => 20, 'sex' => '女'],
-     *                                         ]
-     */
-    public function insert($table, array $fieldData)
-    {
-        $fields = array_keys($fieldData[0]);
-        $fieldsStr = implode(',', $fields);
-        $fieldCounts = count($fields);
-        $sql = "INSERT INTO $table ($fieldsStr) VALUES " . ;
-        return $sql;
-    }
-    
-    
-    /**
-     * 更新数据
-     * @param unknown $table
-     * @param array $arrSets
-     * @param unknown $whereStr
-    */
-    public function update($table, array $arrSets, $whereStr)
-    {
-
-    }
-    
-    /**
-     * 删除数据
-     * @param unknown $table
-     * @param unknown $whereStr
-    */
-    public function delete($table, $whereStr)
-    {
-
-    }
-    
-    /**
      * 返回最后插入的ID
     */
     public function lastInsertId()
     {
-
+        return $this->pdo->lastInsertId();
     }
     
     /**
@@ -179,23 +129,23 @@ class Mysql implements DbInterface
     */
     public function allSql()
     {
-
+        return $this->allSql;
     }
     
     
     public function beginTransaction()
     {
-
+        return $this->pdo->beginTransaction();
     }
     
     public function commit()
     {
-
+        return $this->pdo->commit();
     }
     
     public function rollBack()
     {
-
+        return $this->rollBack();
     }
     
     private function collectSql($sql, array $binds)
@@ -210,10 +160,4 @@ class Mysql implements DbInterface
         $this->allSql[] = $sql;
     }
 
-    private function buildPlaceholder(array $fieldData)
-    {
-        $fields = array_keys($fieldData[0]);
-        $fieldsStr = implode(',', $fields);
-        $fieldCounts = count($fields);
-    }
 }

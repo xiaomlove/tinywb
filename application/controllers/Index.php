@@ -16,17 +16,18 @@ class Index extends Controller
         $res .= " and action is: " . __FUNCTION__;
 //         echo 'ssss';
         $model = new Model;
-        $sql = "SELECT * FROM test1 WHERE 1=:1";
+        $sql = "SELECT * FROM juan WHERE 1=:1";
         // $sql = "SELECT count(*) FROM test1 WHERE id>:id";
         // todump($model->fetchColumn($sql, array(':id' => 0)));
         //dump($model->fetch($sql, array(':1' => 1)));
 
         $field = [
-            ['name' => '小a', 'title' => 'title a', 'sex' => '男'],
-            ['name' => '小b', 'title' => 'title b', 'sex' => '女'],
+            ['type' => 'A', 'value' => 123],
+            ['type' => 'B', 'values' => '123'],
         ];
-        $r = $model->insert('test1', $field);
-        dump($r);
+        //$r = $model->insert('juan', $field);
+        $r = $model->delete('juan', ['id' => [0, '>']]);
+        dump($r, $model->lastSql());
         return $this->display('index/index.php', ['info' => $res]);
     }
 }
