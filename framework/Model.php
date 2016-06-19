@@ -1,35 +1,73 @@
 <?php
+/**
+* @desc 模型基类
+*       一般来说，一个数据表对应一个模型。
+* @author xiaomlove
+* @link http://xiaomlove.com
+* @time 2016年6月19日    下午5:41:20
+*/
+
 namespace framework;
 
 use framework\db\drivers\Mysql;
-use framework\exceptions\SQLException;
 
 class Model
 {
-    private $db;
+    //一个策略ID(就想象成数据库名)创建一个数据库连接对象，同一个库的表的ID是一样的。
+    //以策略ID为键存储起来所有数据库连接
+    private static $dbConnections = [];
+    
+    //以模型完整类名存储起来所有模型对象
+    private static $models = [];
+    
+    private $policyId;
     
     private $policy;
     
+    protected $tableName;
+    
     public function getDb()
     {
-        if (is_null($this->db)) {
-            $this->db = new Mysql($this->policy);
+        if (!isset(self::$dbConnections[$this->policyId])) {
+            self::$dbConnections[$this->policyId] =  new Mysql($this->policy);
         }
-        return $this->db;
+        return self::$dbConnections[$this->policyId];
+    }
+    
+    public function getDbConnections()
+    {
+        return self::$dbConnections;
+    }
+    
+    public function getModels()
+    {
+        return self::$models;
     }
     
     public function __construct($policyId = 'default')
     {
+        echo '实例化一次！<br/>';
+        $className = get_called_class();
+        if (isset(self::$models[$className])) {
+            return self::$models[$className];
+        }
         $policy = Config::get('db.' . $policyId);
         if (empty($policy)) {
             throw new \InvalidArgumentException("Invalid policyId: $policyId");
         }
+        $this->policyId = $policyId;
         $this->policy = $policy;
+        self::$models[$className] = $this;
     }
     
     public function execute($sql, array $binds = [])
     {
         return $this->getDb()->execute($sql, $binds);
+    }
+    
+    public function exec($sql)
+    {
+        return $this->getDb()->exec($sql);
     }
     
     public function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
@@ -56,8 +94,9 @@ class Model
      *    ['name' => '小红', 'age' => 20, 'sex' => '女'],
      * ]
      */
-    public function insert($table, array $fieldData)
+    public function insert($table = '', array $fieldData)
     {
+        $table = $this->getTableName($table);
         if (count($fieldData) === count($fieldData, true)) {
             $fieldData = array($fieldData);
         }
@@ -71,7 +110,7 @@ class Model
         $fieldsStr = rtrim($fieldsStr, ',') . ')';
         unset($field);
         
-        $sql = "INSERT INTO $table $fieldsStr VALUES ";
+        $sql = "INSERT INTO `$table` $fieldsStr VALUES ";
         $binds = [];
         foreach ($fieldData as $k => $row) {
             if (($currCount = count($row)) !== $fieldsCount) {
@@ -88,25 +127,84 @@ class Model
             $sql = rtrim($sql, ','). '),';
         }
         $sql = rtrim($sql, ',');
-        try {
-            return $this->getDb()->execute($sql, $binds);
-        } catch (\PDOException $e) {
-            throw new SQLException(
-                $e->getCode(),
-                $e->getMessage(),
-                $sql,
-                $binds
-            );
-        }
+        return $this->getDb()->execute($sql, $binds);
     }
     
-    public function delete($table, array $where, array $binds = [])
+    public function lastInsertId()
     {
+        return $this->getDb()->lastInsertId();
+    }
+    
+    public function delete($table = '', array $where, array $binds = [])
+    {
+        $table = $this->getTableName($table);
         if (empty($where)) {
             return false;
         }
-        $sql = "DELETE FROM `$table` ". $this->formatWhere($where);
+        $sql = "DELETE FROM `$table`". $this->formatWhere($where);
         return $this->getDb()->execute($sql, $binds);
+    }
+    
+    public function update($table = '', array $fieldData, array $where, array $binds = [])
+    {
+        $table = $this->getTableName($table);
+        if (empty($fieldData) || empty($where)) {
+            return false;
+        }
+        $sql = "UPDATE `$table` SET ";
+        foreach ($fieldData as $field => $value) {
+            $sql .= "`$field` = $value, ";
+        }
+        $sql = rtrim($sql, ', ');
+        $sql .= $this->formatWhere($where);
+        return $this->getDb()->execute($sql, $binds);
+    }
+    
+    /**
+     * 简单查询，需要GROUP BY等复杂查询直接接语句execute.
+     * @param string $table
+     * @param array $where, 见formatWher()
+     * @param string|array $fields
+     * @param string $order
+     * @param string $limit
+     * @param array $binds
+     * @return array|false
+     */
+    public function select($table = '', $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
+    {
+        $table = $this->getTableName($table);
+        $fields = is_array($fields) ? implode(',', $fields) : $fields;
+        $sql = "SELECT $fields FROM `$table`";
+        if (!empty($where)) {
+            $sql .= $this->formatWhere($where);
+        }
+        if (!empty($order)) {
+            $sql .= " ORDER BY $order";
+        }
+        if (!empty($limit)) {
+            $sql .= " LIMIT $limit";
+        }
+        
+        return $this->getDb()->fetchAll($sql, $binds);
+    }
+    
+    public function selectOne($table = '', $fields = '*', array $where = [], $order = '', array $binds = [])
+    {
+        $table = $this->getTableName($table);
+        $fields = is_array($fields) ? implode(',', $fields) : $fields;
+        $sql = "SELECT $fields FROM `$table`";
+        if (!empty($where)) {
+            $sql .= $this->formatWhere($where);
+        }
+        return $this->getDb()->fetch($sql, $binds);
+    }
+    
+    public function count($table = '', array $where, $field = '*', array $binds = [])
+    {
+        $table = $this->getTableName($table);
+        $sql = "SELECT count($field) as counts FROM `$table`" . $this->formatWhere($where) . " LIMIT 1";
+        $result = $this->getDb()->fetch($sql, $binds);
+        return empty($result) ? 0 : $result['counts'];
     }
     
     public function lastSql()
@@ -134,7 +232,7 @@ class Model
         if (empty($where)) {
             return '';
         }
-        $outStr = "WHERE";
+        $outStr = " WHERE";
         foreach ($where as $field => $option) {
             $option = (array)$option;
             $argsCount = count($option);
@@ -153,4 +251,29 @@ class Model
         return rtrim($outStr, ' AND');
     }
     
+    private function getTableName($tableName)
+    {
+        if (!empty($tableName)) {
+            return $tableName;
+        } elseif (property_exists($this, 'tableName')) {
+            return $this->tableName;
+        } else {
+            throw new \RuntimeException("can not get tableName.");
+        }
+    }
+    
+    public function beginTransaction()
+    {
+        return $this->getDb()->beginTransaction();
+    }
+    
+    public function commit()
+    {
+        return $this->getDb()->commit();
+    }
+    
+    public function rollBack()
+    {
+        return $this->getDb()->rollBack();
+    }
 }

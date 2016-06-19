@@ -3,6 +3,7 @@
 namespace framework\db\drivers;
 
 use framework\db\DbInterface;
+use framework\exceptions\SQLException;
 
 class Mysql implements DbInterface
 {
@@ -11,6 +12,8 @@ class Mysql implements DbInterface
     private $lastSql;
     
     private $allSql = [];
+    
+    private $transactions = 0;
 
     private static $attributes = [
         "AUTOCOMMIT", "ERRMODE", "CASE", "CLIENT_VERSION", "CONNECTION_STATUS",
@@ -52,29 +55,57 @@ class Mysql implements DbInterface
     }
     
     /**
-     * 执行任意SQL。
+     * 执行任意语句，一般是不需要prepare的修改设置类，如set names 'GBK'，set autocommit 1.
+     * @param unknown $sql
+     * @return number 返回受影响记录条数，失败则是0
+     */
+    public function exec($sql)
+    {
+        return $this->pdo->exec($sql);
+    }
+    
+    /**
+     * 执行任意需要prepare的非查询语句，如增删改类。
      * @param unknown $sql
      * @param array $binds
+     * @return false|int 成功返回受影响记录条数，失败返回false
      */
     public function execute($sql, array $binds = [])
     {
         $this->collectSql($sql, $binds);
-        $stat = $this->pdo->prepare($sql);
-        $stat->execute($binds);
-        return $stat->rowCount();
+        try {
+            $stat = $this->pdo->prepare($sql);
+            if ($stat === false) {
+                //如果是ERR_SILENT，prepare不成功返回false，直接返回。
+                return false;
+            }
+            $result = $stat->execute($binds);
+            return $result === false ? false : $stat->rowCount();
+        } catch (\PDOException $e) {
+            throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
+        }
     }
     
     /**
      * 执行SELECT，获取一行
      * @param unknown $sql
      * @param array $binds
+     * @return array|false 成功返回记录一维数组，失败返回false
     */
     public function fetch($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
         $this->collectSql($sql, $binds);
-        $stat = $this->pdo->prepare($sql);
-        $stat->execute($binds);
-        return $stat->fetch($fetchStyle);
+        try {
+            $stat = $this->pdo->prepare($sql);
+            if ($stat === false) {
+                return false;
+            }
+            $result = $stat->execute($binds);
+            return $result === false ? false : $stat->fetch($fetchStyle);
+        } catch (\PDOException $e) {
+            throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
+        }
+        
     }
     
     /**
@@ -85,9 +116,17 @@ class Mysql implements DbInterface
     public function fetchAll($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
         $this->collectSql($sql, $binds);
-        $stat = $this->pdo->prepare($sql);
-        $stat->execute($binds);
-        return $stat->fetchAll($fetchStyle);
+        try {
+            $stat = $this->pdo->prepare($sql);
+            if ($stat === false) {
+                return false;
+            }
+            $result = $stat->execute($binds);
+            return $result === false ? false :$stat->fetchAll($fetchStyle);
+        } catch (\PDOException $e) {
+            throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
+        }
+        
     }
     
     /**
@@ -98,9 +137,17 @@ class Mysql implements DbInterface
     public function fetchColumn($sql, array $binds = [])
     {
         $this->collectSql($sql, $binds);
-        $stat = $this->pdo->prepare($sql);
-        $stat->execute($binds);
-        return $stat->fetchColumn();
+        try {
+            $stat = $this->pdo->prepare($sql);
+            if ($stat === false) {
+                return false;
+            }
+            $result = $stat->execute($binds);
+            return $result === false ? false : $stat->fetchColumn();
+        } catch (\PDOException $e) {
+            throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
+        }
+       
     }
     
     
@@ -131,17 +178,34 @@ class Mysql implements DbInterface
     
     public function beginTransaction()
     {
-        return $this->pdo->beginTransaction();
+        ++$this->transactions;
+        if ($this->transactions == 1) {
+            //只有第一层才真正开启事务
+            return $this->pdo->beginTransaction();
+        }
+        return true;
     }
     
     public function commit()
     {
-        return $this->pdo->commit();
+        if ($this->transactions == 1) {
+            $this->transactions = 0;
+            return $this->pdo->commit();
+        } else {
+            --$this->transactions;
+            return true;
+        }
     }
     
     public function rollBack()
     {
-        return $this->rollBack();
+        if ($this->transactions == 1) {
+            $this->transactions = 0;
+            return $this->pdo->rollBack();
+        } else {
+            --$this->transactions;
+            return true;
+        }
     }
     
     private function collectSql($sql, array $binds)
