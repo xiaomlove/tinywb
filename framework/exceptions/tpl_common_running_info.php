@@ -15,31 +15,28 @@
   </li>
   
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_GLOBALS</a>
-  </li>
-  <li class="nav-item">
     <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_REQUEST</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_GET</a>
+    <a class="nav-link" href="#get" role="tab" data-toggle="tab">$_GET</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_POST</a>
+    <a class="nav-link" href="#post" role="tab" data-toggle="tab">$_POST</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_SESSION</a>
+    <a class="nav-link" href="#session" role="tab" data-toggle="tab">$_SESSION</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_COOKIE</a>
+    <a class="nav-link" href="#cookie" role="tab" data-toggle="tab">$_COOKIE</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_FILES</a>
+    <a class="nav-link" href="#files" role="tab" data-toggle="tab">$_FILES</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">$_ENV</a>
+    <a class="nav-link" href="#env" role="tab" data-toggle="tab">$_ENV</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="#request" role="tab" data-toggle="tab">SQLS</a>
+    <a class="nav-link" href="#sqls" role="tab" data-toggle="tab">SQLS</a>
   </li>
 </ul>
 
@@ -83,4 +80,70 @@
         </tbody>
     </table>
   </div>
+  
+  <div role="tabpanel" class="tab-pane fade" id="get">
+    <table>
+        <tbody>
+            <?php foreach ($_GET as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php echo $value?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  </div>
+  
+  <div role="tabpanel" class="tab-pane fade" id="post">
+    <table>
+        <tbody>
+            <?php foreach ($_POST as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php echo $value?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  </div>
+  
+  
+  <div role="tabpanel" class="tab-pane fade" id="session">
+  <?php if (isset($_SESSION)):?>
+    <table>
+        <tbody>
+            <?php foreach ($_SESSION as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php print_r($value)?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  <?php endif?>
+  </div>
+  
+  <div role="tabpanel" class="tab-pane fade" id="cookie">
+    <table>
+        <tbody>
+            <?php foreach ($_COOKIE as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php echo $value?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  </div>
+  
+  <div role="tabpanel" class="tab-pane fade" id="files">
+    <table>
+        <tbody>
+            <?php foreach ($_FILES as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php print_r($value)?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  </div>
+  
+  <div role="tabpanel" class="tab-pane fade" id="env">
+    <table>
+        <tbody>
+            <?php foreach ($_ENV as $key => $value):?>
+            <tr><td width="100px"><?php echo $key?></td><td><?php echo ($value)?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+  </div>
+  
+  
+  
 </div>

@@ -11,27 +11,31 @@ namespace framework;
 
 use framework\db\drivers\Mysql;
 
-class Model
+abstract class Model
 {
     //一个策略ID(就想象成数据库名)创建一个数据库连接对象，同一个库的表的ID是一样的。
     //以策略ID为键存储起来所有数据库连接
     private static $dbConnections = [];
     
-    //以模型完整类名存储起来所有模型对象
+    //以模型完整类名存储起来所有模型对象，模型对象是单例，不能直接new，通过静态方法model()获得对象
     private static $models = [];
-    
-    private $policyId;
-    
-    private $policy;
-    
-    protected $tableName;
     
     public function getDb()
     {
-        if (!isset(self::$dbConnections[$this->policyId])) {
-            self::$dbConnections[$this->policyId] =  new Mysql($this->policy);
+        $policyId = static::pocilyId();
+        if (empty($policyId) || !is_string($policyId)) {
+            throw new \RuntimeException("policyId() function don't return a valid policyId in " . get_called_class());
         }
-        return self::$dbConnections[$this->policyId];
+        if (isset(self::$dbConnections[$policyId])) {
+            return self::$dbConnections[$policyId];
+        }
+        $policy = Config::get('db.' . $policyId);
+        if (empty($policy)) {
+            throw new \InvalidArgumentException("Invalid policyId: $policyId");
+        }
+        $mysql = new Mysql($policy);
+        self::$dbConnections[$policyId] = $mysql;
+        return $mysql;
     }
     
     public function getDbConnections()
@@ -44,20 +48,43 @@ class Model
         return self::$models;
     }
     
-    public function __construct($policyId = 'default')
+    final private function __construct()
     {
-        echo '实例化一次！<br/>';
+        
+    }
+    
+    final private function __clone()
+    {
+        
+    }
+    
+    final public static function model()
+    {
         $className = get_called_class();
         if (isset(self::$models[$className])) {
             return self::$models[$className];
         }
-        $policy = Config::get('db.' . $policyId);
-        if (empty($policy)) {
-            throw new \InvalidArgumentException("Invalid policyId: $policyId");
+        $model = new $className();
+        self::$models[$className] = $model;
+        return $model;
+    }
+    
+    abstract function pocilyId();
+    
+    abstract function tableName();
+    
+    private function getTableName($tableName)
+    {
+        if (!empty($tableName)) {
+            return $tableName;
+        } else {
+            $tableName = static::tableName();
+            if (!empty($tableName) && is_string($tableName)) {
+                return $tableName;
+            } else {
+                throw new \RuntimeException("no pass parameter tableName or function tableName() no return valid string in " . get_called_class());
+            }
         }
-        $this->policyId = $policyId;
-        $this->policy = $policy;
-        self::$models[$className] = $this;
     }
     
     public function execute($sql, array $binds = [])
@@ -94,9 +121,8 @@ class Model
      *    ['name' => '小红', 'age' => 20, 'sex' => '女'],
      * ]
      */
-    public function insert($table = '', array $fieldData)
+    public function insert($table, array $fieldData)
     {
-        $table = $this->getTableName($table);
         if (count($fieldData) === count($fieldData, true)) {
             $fieldData = array($fieldData);
         }
@@ -135,9 +161,8 @@ class Model
         return $this->getDb()->lastInsertId();
     }
     
-    public function delete($table = '', array $where, array $binds = [])
+    public function delete($table, array $where, array $binds = [])
     {
-        $table = $this->getTableName($table);
         if (empty($where)) {
             return false;
         }
@@ -145,9 +170,8 @@ class Model
         return $this->getDb()->execute($sql, $binds);
     }
     
-    public function update($table = '', array $fieldData, array $where, array $binds = [])
+    public function update($table, array $fieldData, array $where, array $binds = [])
     {
-        $table = $this->getTableName($table);
         if (empty($fieldData) || empty($where)) {
             return false;
         }
@@ -170,9 +194,8 @@ class Model
      * @param array $binds
      * @return array|false
      */
-    public function select($table = '', $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
+    public function select($table, $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
     {
-        $table = $this->getTableName($table);
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
         $sql = "SELECT $fields FROM `$table`";
         if (!empty($where)) {
@@ -199,9 +222,8 @@ class Model
         return $this->getDb()->fetch($sql, $binds);
     }
     
-    public function count($table = '', array $where, $field = '*', array $binds = [])
+    public function count($table, array $where, $field = '*', array $binds = [])
     {
-        $table = $this->getTableName($table);
         $sql = "SELECT count($field) as counts FROM `$table`" . $this->formatWhere($where) . " LIMIT 1";
         $result = $this->getDb()->fetch($sql, $binds);
         return empty($result) ? 0 : $result['counts'];
@@ -249,17 +271,6 @@ class Model
             $outStr .= " AND";
         }
         return rtrim($outStr, ' AND');
-    }
-    
-    private function getTableName($tableName)
-    {
-        if (!empty($tableName)) {
-            return $tableName;
-        } elseif (property_exists($this, 'tableName')) {
-            return $this->tableName;
-        } else {
-            throw new \RuntimeException("can not get tableName.");
-        }
     }
     
     public function beginTransaction()

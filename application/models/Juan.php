@@ -5,10 +5,17 @@ use framework\Model;
 
 class Juan extends Model
 {
-    protected  $tableName = 'juan';
-    
-    public function __construct($policyId = 'wordpress')
+    public function pocilyId()
     {
-        parent::__construct($policyId);
+        return 'default';
+    }
+    
+    public function tableName()
+    {
+        return 'juan';
+    }
+
+    public function test()
+    {
     }
 }

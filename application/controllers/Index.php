@@ -13,19 +13,21 @@ class Index extends Controller
     
     public function index()
     {
+//         dump($_SESSION);
+        
         $res = "controller is: " . __CLASS__;
         $res .= " and action is: " . __FUNCTION__;
-        $model = new Test;
-        $model->getDb();
-        $model2 = new Juan;
-        $model3 = new Juan;
+        
+        $model2 = Juan::model();
         $model2->getDb();
-//         $model->insert('juan', [
+        $model3 = Test::model();
+        $model3->getDb();
+//         $model2->insert('juan', [
 //             ['type' => 'A', 'value' => 1],
 //             ['type' => 'B', 'value' => 2],
 //         ]);
         
-        dump($model->getModels(), $model2->getDbConnections());
+        dump($model3->selectOne());
         return $this->display('index/index.php', ['info' => $res]);
     }
 }
