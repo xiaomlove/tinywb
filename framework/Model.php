@@ -22,7 +22,7 @@ abstract class Model
     
     public function getDb()
     {
-        $policyId = static::pocilyId();
+        $policyId = static::policyId();
         if (empty($policyId) || !is_string($policyId)) {
             throw new \RuntimeException("policyId() function don't return a valid policyId in " . get_called_class());
         }
@@ -69,7 +69,7 @@ abstract class Model
         return $model;
     }
     
-    abstract function pocilyId();
+    abstract function policyId();
     
     abstract function tableName();
     

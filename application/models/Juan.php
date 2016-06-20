@@ -5,7 +5,7 @@ use framework\Model;
 
 class Juan extends Model
 {
-    public function pocilyId()
+    public function policyId()
     {
         return 'default';
     }

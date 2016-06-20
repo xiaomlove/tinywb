@@ -5,7 +5,7 @@ use framework\Model;
 
 class Test extends Model
 {
-    public function pocilyId()
+    public function policyId()
     {
         return 'wordpress';
     }
