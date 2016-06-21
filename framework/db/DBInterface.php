@@ -2,8 +2,10 @@
 
 namespace framework\db;
 
-interface DbInterface 
+interface DBInterface 
 {
+    
+    public function exec($sql);
     
     /**
      * 执行任意sql语句

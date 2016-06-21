@@ -9,14 +9,10 @@
 
 namespace framework;
 
-use framework\db\drivers\Mysql;
+use framework\db\DB;
 
 abstract class Model
 {
-    //一个策略ID(就想象成数据库名)创建一个数据库连接对象，同一个库的表的ID是一样的。
-    //以策略ID为键存储起来所有数据库连接
-    private static $dbConnections = [];
-    
     //以模型完整类名存储起来所有模型对象，模型对象是单例，不能直接new，通过静态方法model()获得对象
     private static $models = [];
     
@@ -26,24 +22,10 @@ abstract class Model
         if (empty($policyId) || !is_string($policyId)) {
             throw new \RuntimeException("policyId() function don't return a valid policyId in " . get_called_class());
         }
-        if (isset(self::$dbConnections[$policyId])) {
-            return self::$dbConnections[$policyId];
-        }
-        $policy = Config::get('db.' . $policyId);
-        if (empty($policy)) {
-            throw new \InvalidArgumentException("Invalid policyId: $policyId");
-        }
-        $mysql = new Mysql($policy);
-        self::$dbConnections[$policyId] = $mysql;
-        return $mysql;
+        return DB::getConnection($policyId);
     }
     
-    public function getDbConnections()
-    {
-        return self::$dbConnections;
-    }
-    
-    public function getModels()
+    public function getAllModels()
     {
         return self::$models;
     }

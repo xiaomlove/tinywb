@@ -144,6 +144,20 @@
     </table>
   </div>
   
+  <div role="tabpanel" class="tab-pane fade" id="sqls">
+  <?php foreach (framework\db\DB::allSql() as $policyId => $sqlArr):?>
+    <h3><?php echo $policyId?>:</h3>
+    <table>
+        <tbody>
+            <?php foreach ($sqlArr as $sql):?>
+            <tr><td><?php echo $sql?></td></tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+    <br/>
+    <?php endforeach;?>
+  </div>
+  
   
   
 </div>

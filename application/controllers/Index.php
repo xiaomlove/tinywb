@@ -5,7 +5,7 @@ use framework\Controller;
 
 use models\Test;
 use models\Juan;
-use framework\Model;
+use framework\db\DB;
 
 class Index extends Controller
 {
@@ -17,17 +17,16 @@ class Index extends Controller
         
         $res = "controller is: " . __CLASS__;
         $res .= " and action is: " . __FUNCTION__;
-        
-        $model2 = Juan::model();
-        $model2->getDb();
-        $model3 = Test::model();
-        $model3->getDb();
+//         $model2 = Juan::model();
+//         $model2->getDb();
+//         $model3 = Test::model();
+//         $model3->getDb();
 //         $model2->insert('juan', [
 //             ['type' => 'A', 'value' => 1],
 //             ['type' => 'B', 'value' => 2],
 //         ]);
         
-        dump($model3->selectOne());
+//         dump($model3->selectOne(), $model3->allSql(), DB::allSql(), DB::getAllConnections());
         return $this->display('index/index.php', ['info' => $res]);
     }
 }

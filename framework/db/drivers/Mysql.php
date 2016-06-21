@@ -2,10 +2,10 @@
 
 namespace framework\db\drivers;
 
-use framework\db\DbInterface;
+use framework\db\DBInterface;
 use framework\exceptions\SQLException;
 
-class Mysql implements DbInterface
+class Mysql implements DBInterface
 {
     private $pdo;
     
