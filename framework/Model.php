@@ -16,7 +16,7 @@ abstract class Model
     //以模型完整类名存储起来所有模型对象，模型对象是单例，不能直接new，通过静态方法model()获得对象
     private static $models = [];
     
-    public function getDb()
+    protected function getDb()
     {
         $policyId = static::policyId();
         if (empty($policyId) || !is_string($policyId)) {
@@ -69,27 +69,27 @@ abstract class Model
         }
     }
     
-    public function execute($sql, array $binds = [])
+    protected function execute($sql, array $binds = [])
     {
         return $this->getDb()->execute($sql, $binds);
     }
     
-    public function exec($sql)
+    protected function exec($sql)
     {
         return $this->getDb()->exec($sql);
     }
     
-    public function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    protected function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
     {
         return $this->getDb()->fetch($sql, $binds, $fetcyStyle);
     }
     
-    public function fetchAll($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    protected function fetchAll($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
     {
         return $this->getDb()->fetchAll($sql, $binds, $fetcyStyle);
     }
     
-    public function fetchColumn($sql, array $binds = [])
+    protected function fetchColumn($sql, array $binds = [])
     {
         return $this->getDb()->fetchColumn($sql, $binds);
     }
@@ -103,7 +103,7 @@ abstract class Model
      *    ['name' => '小红', 'age' => 20, 'sex' => '女'],
      * ]
      */
-    public function insert($table, array $fieldData)
+    protected function insert($table, array $fieldData)
     {
         if (count($fieldData) === count($fieldData, true)) {
             $fieldData = array($fieldData);
@@ -138,12 +138,12 @@ abstract class Model
         return $this->getDb()->execute($sql, $binds);
     }
     
-    public function lastInsertId()
+    protected function lastInsertId()
     {
         return $this->getDb()->lastInsertId();
     }
     
-    public function delete($table, array $where, array $binds = [])
+    protected function delete($table, array $where, array $binds = [])
     {
         if (empty($where)) {
             return false;
@@ -152,7 +152,7 @@ abstract class Model
         return $this->getDb()->execute($sql, $binds);
     }
     
-    public function update($table, array $fieldData, array $where, array $binds = [])
+    protected function update($table, array $fieldData, array $where, array $binds = [])
     {
         if (empty($fieldData) || empty($where)) {
             return false;
@@ -176,7 +176,7 @@ abstract class Model
      * @param array $binds
      * @return array|false
      */
-    public function select($table, $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
+    protected function select($table, $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
     {
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
         $sql = "SELECT $fields FROM `$table`";
@@ -193,7 +193,7 @@ abstract class Model
         return $this->getDb()->fetchAll($sql, $binds);
     }
     
-    public function selectOne($table = '', $fields = '*', array $where = [], $order = '', array $binds = [])
+    protected function selectOne($table = '', $fields = '*', array $where = [], $order = '', array $binds = [])
     {
         $table = $this->getTableName($table);
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
@@ -204,7 +204,7 @@ abstract class Model
         return $this->getDb()->fetch($sql, $binds);
     }
     
-    public function count($table, array $where, $field = '*', array $binds = [])
+    protected function count($table, array $where, $field = '*', array $binds = [])
     {
         $sql = "SELECT count($field) as counts FROM `$table`" . $this->formatWhere($where) . " LIMIT 1";
         $result = $this->getDb()->fetch($sql, $binds);
@@ -255,17 +255,17 @@ abstract class Model
         return rtrim($outStr, ' AND');
     }
     
-    public function beginTransaction()
+    protected function beginTransaction()
     {
         return $this->getDb()->beginTransaction();
     }
     
-    public function commit()
+    protected function commit()
     {
         return $this->getDb()->commit();
     }
     
-    public function rollBack()
+    protected function rollBack()
     {
         return $this->getDb()->rollBack();
     }

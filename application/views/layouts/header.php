@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/tether/1.3.2/css/tether.min.css" rel="stylesheet">
+    <link href="static/css/main.css" rel="stylesheet">
     <!-- jQuery first, then Bootstrap JS. -->
     <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
     <script src="//cdn.bootcss.com/tether/1.3.2/js/tether.min.js"></script>
