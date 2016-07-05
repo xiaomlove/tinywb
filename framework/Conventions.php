@@ -9,6 +9,8 @@
 return [
     'app_debug' => true,//默认开启debug模式
     
+    'show_running_info' => true,//默认显示运行信息
+    
     'use_framework_exception_handler' => 1,//是否使用框架的异常处理机制，为0不使用
 
     'use_framework_error_handler' => 1,//是否使用框架的错误处理机制，为0不使用

@@ -147,16 +147,18 @@ final class App extends Container
         
         $result = $this->runController($matchedRoute);
         $runningInfo = '';
-        if ($this->isDebug) {
+        if ($this->isDebug && Config::get('show_running_info')) {
             $runningInfo = View::getInstance()->render(__DIR__ . '/exceptions/tpl_common_running_info.php');
         }
         if ($result instanceof Response) {
             $result->appendContent($runningInfo);
             $result->send();
         } elseif (is_array($result)) {
-            (new Response($result . $runningInfo))->send();
+            $response = new Response($result);
+            $response->appendContent($runningInfo);
+            $response->send();
         } elseif (is_scalar($result)) {
-            (new Response((string)$result))->send();
+            (new Response((string)$result . $runningInfo))->send();
         } else {
             throw new \UnexpectedValueException("Not support response type: " . gettype($result));
         }
