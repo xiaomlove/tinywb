@@ -176,15 +176,15 @@ abstract class Model
      * @param array $binds
      * @return array|false
      */
-    protected function select($table, $fields = '*', array $where = [],  $order = '', $limit = '', array $binds = [])
+    protected function select($table, $fields = '*', array $where = [],  $orderby = '', $order = '', $limit = '', array $binds = [])
     {
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
         $sql = "SELECT $fields FROM `$table`";
         if (!empty($where)) {
             $sql .= $this->formatWhere($where);
         }
-        if (!empty($order)) {
-            $sql .= " ORDER BY $order";
+        if (!empty($orderby) && !empty($order)) {
+            $sql .= " ORDER BY `$orderby` $order";
         }
         if (!empty($limit)) {
             $sql .= " LIMIT $limit";
@@ -193,7 +193,7 @@ abstract class Model
         return $this->getDb()->fetchAll($sql, $binds);
     }
     
-    protected function selectOne($table = '', $fields = '*', array $where = [], $order = '', array $binds = [])
+    protected function selectOne($table = '', $fields = '*', array $where = [], $orderby = '', $order = '', array $binds = [])
     {
         $table = $this->getTableName($table);
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
@@ -201,6 +201,10 @@ abstract class Model
         if (!empty($where)) {
             $sql .= $this->formatWhere($where);
         }
+        if (!empty($orderby) && !empty($order)) {
+            $sql .= " ORDER BY `$orderby` $order";
+        }
+        $sql .= " LIMIT 1";
         return $this->getDb()->fetch($sql, $binds);
     }
     

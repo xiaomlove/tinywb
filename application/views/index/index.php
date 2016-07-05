@@ -6,49 +6,23 @@
     </div>
     <div class="row">
         <div class="col-md-8">
+        <?php if (!empty($list)):?>
+        <?php foreach ($list as $article):?>
             <article class="article">
-                <h2>这是标题</h2>
+                <h2><?php echo $article['title']?></h2>
                 <p>
-                    <time class="date-time">2016-12-23</time>
+                    <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time>
                     <span class="tags">
                         <a href="#">标签一</a>
                         <a href="#">标签二</a>
                     </span>
                 </p>
             </article>
+           <?php endforeach;?>
+           <?php else:?>
+           <strong>oops!还没有文章。</strong>
+           <?php endif?> 
             
-            <article class="article">
-                <h2>这是标题</h2>
-                <p>
-                    <time class="date-time">2016-12-23</time>
-                    <span class="tags">
-                        <a href="#">标签一</a>
-                        <a href="#">标签二</a>
-                    </span>
-                </p>
-            </article>
-            
-            <article class="article">
-                <h2>这是标题</h2>
-                <p>
-                    <time class="date-time">2016-12-23</time>
-                    <span class="tags">
-                        <a href="#">标签一</a>
-                        <a href="#">标签二</a>
-                    </span>
-                </p>
-            </article>
-            
-            <article class="article">
-                <h2>这是标题</h2>
-                <p>
-                    <time class="date-time">2016-12-23</time>
-                    <span class="tags">
-                        <a href="#">标签一</a>
-                        <a href="#">标签二</a>
-                    </span>
-                </p>
-            </article>
             
             <nav>
               <ul class="pagination">
@@ -74,8 +48,11 @@
             <div>
                 <h2>最新文章</h2>
                 <ul>
-                    <li><a href="#">张三跳楼了</a></li>
-                    <li><a href="#">张三跳楼了</a></li>
+                    <?php if (!empty($newest)):?>
+                    <?php foreach ($newest as $item):?>
+                    <li><a href="#"><?php echo $item['title']?></a></li>
+                    <?php endforeach;?>
+                    <?php endif?>
                 </ul>
             </div>
             

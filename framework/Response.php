@@ -134,6 +134,16 @@ class Response
         }
     }
     
+    public function appendContent($content, $prepend = false)
+    {
+        $content = (string)$content;
+        if ($prepend) {
+            $this->content = $content . $this->content;
+        } else {
+            $this->content .= $content;
+        }
+    }
+    
     public function setHeader($key, $value)
     {
        if (!is_string($key) || !is_string($value)) {

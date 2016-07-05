@@ -1,4 +1,5 @@
-<br/>
+<hr/>
+<div style="margin: 20px">
 <h5>Matched Route: <?php print_r(app('route')->getMatchedRoute())?></h5>
 <br/>
 <h2>Total Cost Time: <?php echo number_format(microtime(true) - APP_START_TIME, 4)?> seconds. Memory Used: <?php echo number_format(memory_get_peak_usage(true)/1024, 2)?> KB</h2>
@@ -158,6 +159,5 @@
     <?php endforeach;?>
   </div>
   
-  
-  
+</div>
 </div>

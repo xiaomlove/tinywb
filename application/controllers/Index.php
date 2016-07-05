@@ -2,8 +2,7 @@
 namespace controllers;
 
 use framework\Controller;
-
-use models\Topic;
+use services\TopicService;
 
 class Index extends Controller
 {
@@ -11,8 +10,9 @@ class Index extends Controller
     
     public function index()
     {
-        $topicModel = Topic::model();
-        $list = $topicModel->getList('*', );
-        return $this->display('index/index.php');
+        $list = TopicService::getHomeArticles(1, 10, 'publish_time', 'DESC');
+        $newest = TopicService::getNewest(5);
+        
+        return $this->display('index/index.php', ['list' => $list, 'newest' => $newest]);
     }
 }

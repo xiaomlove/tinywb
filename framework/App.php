@@ -146,11 +146,15 @@ final class App extends Container
         //在实例化控制器之前，有个启动文件会引入，里边的代码都会被执行？
         
         $result = $this->runController($matchedRoute);
-        
+        $runningInfo = '';
+        if ($this->isDebug) {
+            $runningInfo = View::getInstance()->render(__DIR__ . '/exceptions/tpl_common_running_info.php');
+        }
         if ($result instanceof Response) {
+            $result->appendContent($runningInfo);
             $result->send();
         } elseif (is_array($result)) {
-            (new Response($result))->send();
+            (new Response($result . $runningInfo))->send();
         } elseif (is_scalar($result)) {
             (new Response((string)$result))->send();
         } else {
