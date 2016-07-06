@@ -71,7 +71,7 @@ class Request
 
 	public function getMethod()
 	{
-		$methodParameter = Config::get('method_parameter');
+		$methodParameter = Config::get('default_method_parameter');
 		$method = $this->getParam($methodParameter);
 		if (!empty($method)) {
 		    return strtoupper($method);
@@ -91,7 +91,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->param[$name]) ? $this->param[$name] : '';
+	    return isset($this->param[$name]) ? $this->param[$name] : null;
 	}
 	
     public function getGet($name = null)
@@ -101,7 +101,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->get[$name]) ? $this->get[$name] : '';
+	    return isset($this->get[$name]) ? $this->get[$name] : null;
 	}
 	
     public function getPost($name = null)
@@ -111,7 +111,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->post[$name]) ? $this->post[$name] : '';
+	    return isset($this->post[$name]) ? $this->post[$name] : null;
 	}
 	
 	public function getServer($name = null)
@@ -121,7 +121,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->server[$name]) ? $this->server[$name] : '';
+	    return isset($this->server[$name]) ? $this->server[$name] : null;
 	}
 	
 	public function getHeader($name = null)
@@ -131,7 +131,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->header[$name]) ? $this->header[$name] : '';
+	    return isset($this->header[$name]) ? $this->header[$name] : null;
 	}
 	
 	private function initHeaders()

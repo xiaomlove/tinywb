@@ -3,6 +3,7 @@ namespace controllers;
 
 use framework\Controller;
 use services\TopicService;
+use framework\utils\Pagination;
 
 class Index extends Controller
 {
@@ -10,9 +11,21 @@ class Index extends Controller
     
     public function index()
     {
-        $list = TopicService::getHomeArticles(1, 10, 'publish_time', 'DESC');
-        $newest = TopicService::getNewest(5);
+        $page = $this->request->getParam('page');
+        $page = empty($page) ? 1 : intval($page);
+        $total = 31420000;
+        $per = 10;
+        $totalPage = ceil($total/$per);
         
-        return $this->display('index/index.php', ['list' => $list, 'newest' => $newest]);
+        $list = TopicService::getHomeArticles($page, $per, 'publish_time', 'DESC');
+        $newest = TopicService::getNewest(5);
+        $paginationObj = new Pagination($page, $totalPage);
+        $paginationObj->itemClass = 'page-item';
+        
+        return $this->display('index/index.php', [
+            'list' => $list, 
+            'newest' => $newest,
+            'pagination' => $paginationObj->show(),
+        ]);
     }
 }

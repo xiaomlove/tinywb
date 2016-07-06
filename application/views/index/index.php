@@ -22,8 +22,10 @@
            <?php else:?>
            <strong>oops!还没有文章。</strong>
            <?php endif?> 
-            
-            
+           
+           <nav><?php echo $pagination?></nav>
+           
+            <!-- 
             <nav>
               <ul class="pagination">
                 <li class="page-item">
@@ -43,6 +45,7 @@
                 </li>
               </ul>
             </nav>
+             -->
         </div>
         <div class="col-md-4">
             <div>
