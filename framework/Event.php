@@ -99,7 +99,6 @@ class Event
             if (isset($item[$idx]))
             {
                 unset(self::$events[$name][$priority][$idx]);
-                return true;
             }
         }
         return true;
