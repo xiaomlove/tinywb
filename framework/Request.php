@@ -121,6 +121,7 @@ class Request
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
+	    $name = strtoupper($name);
 	    return isset($this->server[$name]) ? $this->server[$name] : null;
 	}
 	

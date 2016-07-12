@@ -35,5 +35,18 @@ return [
         'framework\providers\ConfigProvider',
         'framework\providers\AutoloadProvider',
         'framework\providers\RouteProvider',
+        'framework\providers\EventProvider',
+    ],
+    
+    //默认事件
+    'default_events' => [
+        'APP_START',
+        'BEFORE_REQUEST',
+        'AFTER_REQUEST',
+        'BEFORE_CONTROLLER',
+        'AFTER_CONTROLLER',
+        'BEFORE_ACTION',
+        'AFTER_ACTION',
+        'APP_STOP',
     ],
 ];

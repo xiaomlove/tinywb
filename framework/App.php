@@ -53,13 +53,13 @@ final class App extends Container
      */
     private function registerNamespace()
     {
-        $defauleNamespaces = Config::get('default_namespaces');
+        $defaultNamespaces = Config::get('default_namespaces');
         $namespaces = Config::get('namespaces');
         if (is_array($namespaces) && (!empty($namespaces))) {
-            $defauleNamespaces = array_merge($defauleNamespaces, $namespaces);
+            $defaultNamespaces = array_merge($defaultNamespaces, $namespaces);
         }
         $loader = Autoload::getInstance();
-        foreach ($defauleNamespaces as $name => $path) {
+        foreach ($defaultNamespaces as $name => $path) {
             $loader->addNamespace($name, $path);
         }
         return true;
@@ -71,6 +71,18 @@ final class App extends Container
             throw new \RuntimeException("Every application should have a 'route.php' file under the application root path.");
         }
         require APP_PATH . '/route.php';
+        return true;
+    }
+    
+    private function registerEvent()
+    {
+        $defaulEvents = Config::get('default_events');
+        $events = Config::get('events');
+        if (is_array($events) && (!empty($events))) {
+            $defaulEvents = array_merge($defaulEvents, $events);
+        }
+        $eventObj = Event::getInstance();
+        $eventObj->create($defaulEvents);
         return true;
     }
     
@@ -122,11 +134,15 @@ final class App extends Container
         
         $this->registerRoute();
         
+        $this->registerEvent();
+        
         $request = app('request');
         $route = app('route');
         $autoload = app('autoload');
         $routeMaps = $route->getRouteMaps();
         $routeMapsFlip = $route->getRouteMapsFlip();
+        $event = app('event');
+//         dump($event->getEvent());
         
         //dump($this->getProviders());
         try {
