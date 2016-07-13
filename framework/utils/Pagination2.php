@@ -14,10 +14,10 @@ class Pagination2
     private $defaults = [
         'baseUrl' => '',//基础URL，不含query_string
         'pageParam' => 'page',//页码形参
-        'total' => 0,//总页数
+        'total' => 2,//总页数
         'current' => 1,//当前页数
-        'sideSize' => 2,//第一和最后一页旁边页数
-        'centerSize' => 2,//当前页两边页数
+        'sideSize' => 1,//第一和最后一页旁边页数
+        'centerSize' => 1,//当前页两边页数
         'type' => 'html',//返回格式，有html的array
         'parameters' => [],//额外参数键值
         'fragment' => '',//锚点
@@ -37,9 +37,17 @@ class Pagination2
     
     private $options = [];
     
+    private $centerBegin;
+    
+    private $centerEnd;
+    
     public function __construct(array $parameters = [])
     {
         $options = array_merge($this->defaults, $parameters);
+        if ($options['current'] > $options['total'])
+        {
+            $options['current'] = $this->defaults['current'];
+        }
         $this->options = $options;
     }
     
@@ -78,7 +86,6 @@ class Pagination2
     private function createPageItem()
     {
         return [
-            'class' => '',
             'text' => '',
             'url' => '',
             'page' => '',
@@ -95,6 +102,7 @@ class Pagination2
             $page['isActive'] = true;
         }
         $page['page'] = 1;
+        $page['text'] = $this->options['firstText'];
         return $page;
     }
     
@@ -109,7 +117,7 @@ class Pagination2
         {
             $page['page'] = intval($this->options['current']) - 1;
         }
-    
+        $page['text'] = $this->options['nextText'];
         return $page;
     }
     
@@ -121,6 +129,7 @@ class Pagination2
             $page['isActive'] = true;
         }
         $page['page'] = intval($this->options['total']);
+        $page['text'] = $this->options['lastText'];
         return $page;
     }
     
@@ -136,20 +145,76 @@ class Pagination2
         {
             $page['page'] = intval($this->options['current']) + 1;
         }
-    
+        $page['text'] = $this->options['nextText'];
         return $page;
     }
     
-    public function getPageItemNormal()
+    public function getPageItemCenter()
     {
-        
+        $begin = $this->options['current'] - $this->options['centerSize'];
+        $end = $this->options['current'] + $this->options['centerSize'];
+        $begin = $this->centerBegin = max(2, $begin);
+        $end = $this->centerEnd = min($this->options['total'] - 1, $end);
+        $result = [];
+        for ($i = $begin; $i <= $end; $i++)
+        {
+            $page = $this->createPageItem();
+            if ($this->options['current'] == $i)
+            {
+                $page['isActive'] = true;
+            }
+            $page['page'] = $i;
+            $page['text'] = $i;
+            $result[] = $page;
+        }
+        return $result;
+    }
+    
+    public function getPageItemSideLeft()
+    {
+        $begin = 2;
+        $end = 2 + $this->options['sideSize'];
+        $end = min($end, $this->centerBegin);
+        $result = [];
+        for ($i = $begin; $i <= $end; $i++)
+        {
+            $page = $this->createPageItem();
+            if ($this->options['current'] == $i)
+            {
+                $page['isActive'] = true;
+            }
+            $page['page']= $i;
+            $page['text'] = $i;
+            $result[] = $page;
+        }
+        return $result;
+    }
+    
+    public function getPageItemSideRight()
+    {
+        $begin = $this->options['total'] - $this->options['sideSize'];
+        $begin = max($begin, $this->centerEnd);
+        $end = $this->options['total'] - 1;
+        $result = [];
+        for ($i = $begin; $i <= $end; $i++)
+        {
+            $page = $this->createPageItem();
+            if ($this->options['current'] == $i)
+            {
+                $page['isActive'] = true;
+            }
+            $page['page']= $i;
+            $page['text'] = $i;
+            $result[] = $page;
+        }
+        return $result;
     }
     
     private function buildPageItems()
     {
         if ($this->options['total'] < 2)
         {
-            return null;
+            return array();
         }
         $baseUrl = $this->getBaseUrl();
         
