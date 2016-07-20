@@ -23,9 +23,13 @@ class Index extends Controller
         $per = 10;
         $totalPage = ceil($total/$per);
         
-        $pagination = Pagination2::create();
-        
-        dump($pagination);
+        $pagination = Pagination2::create([
+            'total' => $total,
+            'current' => $page,
+            'centerSize' => 2,
+            'firstText' => false,
+            'lastText' => false
+        ]);
         
         $list = TopicService::getHomeArticles($page, $per, 'publish_time', 'DESC');
         $newest = TopicService::getNewest(5);
@@ -33,6 +37,7 @@ class Index extends Controller
         return $this->display('index/index.php', [
             'list' => $list, 
             'newest' => $newest,
+            'pagination' => $pagination,
         ]);
     }
 }

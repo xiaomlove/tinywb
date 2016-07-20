@@ -37,6 +37,8 @@ class Pagination2
     
     private $options = [];
     
+    private $baseUrl;
+    
     private $centerBegin;
     
     private $centerEnd;
@@ -44,11 +46,12 @@ class Pagination2
     public function __construct(array $parameters = [])
     {
         $options = array_merge($this->defaults, $parameters);
-        if ($options['current'] > $options['total'])
+        if (($options['current'] > $options['total']) || ($options['current'] < 1))
         {
             $options['current'] = $this->defaults['current'];
         }
         $this->options = $options;
+        $this->baseUrl = $this->getBaseUrl();
     }
     
     private function getBaseUrl()
@@ -61,7 +64,7 @@ class Pagination2
         $result = http_build_query($args);
         if (empty($result))
         {
-            return sprintf(
+            $baseUrl = sprintf(
                 "%s?%s=", 
                 $this->options['baseUrl'],
                 $this->options['pageParam']
@@ -69,13 +72,14 @@ class Pagination2
         }
         else
         {
-            return sprintf(
+            $baseUrl = sprintf(
                 "%s?%s&%s=", 
                 $this->options['baseUrl'],
                 $result,
                 $this->options['pageParam']
             );
         }
+        return $baseUrl;
     }
     
     public static function create(array $parameters = [])
@@ -101,8 +105,13 @@ class Pagination2
         {
             $page['isActive'] = true;
         }
+        else 
+        {
+            $page['url'] = $this->baseUrl . '1';
+        }
         $page['page'] = 1;
-        $page['text'] = $this->options['firstText'];
+        $page['text'] = empty($this->options['firstText']) ? '1' : $this->options['firstText'];
+        
         return $page;
     }
     
@@ -115,9 +124,10 @@ class Pagination2
         }
         else
         {
+            $page['url'] = $this->baseUrl . ($this->options['current'] - 1);
             $page['page'] = intval($this->options['current']) - 1;
         }
-        $page['text'] = $this->options['nextText'];
+        $page['text'] = $this->options['prevText'];
         return $page;
     }
     
@@ -128,8 +138,13 @@ class Pagination2
         {
             $page['isActive'] = true;
         }
+        else 
+        {
+            $page['url'] = $this->baseUrl . $this->options['total'];
+        }
         $page['page'] = intval($this->options['total']);
-        $page['text'] = $this->options['lastText'];
+        $page['text'] = empty($this->options['lastText']) ? $this->options['total'] : $this->options['lastText'];
+        
         return $page;
     }
     
@@ -143,7 +158,8 @@ class Pagination2
         }
         else
         {
-            $page['page'] = intval($this->options['current']) + 1;
+            $page['url'] = $this->baseUrl . ($this->options['current'] + 1);
+            $page['page'] = $this->options['current'] + 1;
         }
         $page['text'] = $this->options['nextText'];
         return $page;
@@ -155,8 +171,24 @@ class Pagination2
         $end = $this->options['current'] + $this->options['centerSize'];
         $begin = $this->centerBegin = max(2, $begin);
         $end = $this->centerEnd = min($this->options['total'] - 1, $end);
+        $pageArr = range($begin, $end);
+        
+        $pageSideLeft = $pageSideRight = [];
+        
+        if ($this->options['sideSize'] > 0)
+        {
+           $pageSideLeft = range(2, min(1 + $this->options['sideSize'], $this->options['total']));
+        }
+        if ($this->options['sideSize'] > 0)
+        {
+            $pageSideRight = range(max($this->options['total'] - $this->options['sideSize'], 2), $this->options['total'] - 1);
+        }
+       
+        $pageArr = array_merge($pageSideLeft, $pageArr, $pageSideRight);
+        $pageArr = array_unique($pageArr);
+        
         $result = [];
-        for ($i = $begin; $i <= $end; $i++)
+        foreach ($pageArr as $k => $i)
         {
             $page = $this->createPageItem();
             if ($this->options['current'] == $i)
@@ -165,64 +197,62 @@ class Pagination2
             }
             $page['page'] = $i;
             $page['text'] = $i;
+            $page['url'] = $this->baseUrl . $i;
             $result[] = $page;
         }
         return $result;
     }
     
-    public function getPageItemSideLeft()
-    {
-        $begin = 2;
-        $end = 2 + $this->options['sideSize'];
-        $end = min($end, $this->centerBegin);
-        $result = [];
-        for ($i = $begin; $i <= $end; $i++)
-        {
-            $page = $this->createPageItem();
-            if ($this->options['current'] == $i)
-            {
-                $page['isActive'] = true;
-            }
-            $page['page']= $i;
-            $page['text'] = $i;
-            $result[] = $page;
-        }
-        return $result;
-    }
-    
-    public function getPageItemSideRight()
-    {
-        $begin = $this->options['total'] - $this->options['sideSize'];
-        $begin = max($begin, $this->centerEnd);
-        $end = $this->options['total'] - 1;
-        $result = [];
-        for ($i = $begin; $i <= $end; $i++)
-        {
-            $page = $this->createPageItem();
-            if ($this->options['current'] == $i)
-            {
-                $page['isActive'] = true;
-            }
-            $page['page']= $i;
-            $page['text'] = $i;
-            $result[] = $page;
-        }
-        return $result;
-    }
     
     private function buildPageItems()
     {
         if ($this->options['total'] < 2)
         {
-            return array();
+            return [];
         }
-        $baseUrl = $this->getBaseUrl();
         
+        $first = $this->getPageItemFirst();
+        $last = $this->getPageItemLast();
+        $center = $this->getPageItemCenter();
+        
+        $prev = $this->getPageItemPrev();
+        $next = $this->getPageItemNext();
+        $result = $center;
+        array_push($result, $last, $next);
+        array_unshift($result, $prev, $first);
+        return $result;
     }
     
-    private function formatPageItems(array $pageItems)
+    private function buildPaginationHtml(array $pageItems)
     {
-        
+        if (empty($pageItems))
+        {
+            return '';
+        }
+        $html = sprintf('<ul class="%s"></ul>', $this->options['mainClass']);
+        $html .= $this->options['before'];
+        foreach ($pageItems as $item)
+        {
+            $class = $this->options['itemClass'];
+            if ($item['isActive'])
+            {
+                $class .= ' ' . $this->options['activeClass'];
+            }
+            elseif ($item['isDisabled'])
+            {
+                $class .= ' ' . $this->options['disabledClass'];
+            }
+            $html .= sprintf('
+                <li class="%s"><a class="%s" href="%s">%s</a></li>',
+                $class,
+                $this->options['linkClass'],
+                $item['isDisabled'] || $item['isActive'] ? 'javascript:;' : $item['url'],
+                $item['text']
+            );
+        }
+        $html .= $this->options['after'];
+        $html .= '</ul>';
+        return $html;
     }
     
     public function make()
@@ -231,8 +261,16 @@ class Pagination2
         switch ($this->options['type'])
         {
             case 'html':
-                
+                $result = $this->buildPaginationHtml($pageItems);
+                break;
+            case 'array':
+                $result = $pageItems;
+                break;
+            default:
+                $result = $this->buildPaginationHtml($pageItems);
+                break;
         }
+        return $result;
     }
     
 }
