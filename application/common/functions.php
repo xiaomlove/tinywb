@@ -5,3 +5,25 @@
 * @link http://xiaomlove.com
 * @time 2016年7月7日    上午12:05:45
 */
+
+use framework\utils\Pagination2;
+
+/**
+ * 创建分页。
+ * @param unknown $total 记录总数
+ * @param unknown $page 当前页
+ * @param number $size 每页数
+ * @return string 分页HTML代码
+ */
+function getPagination($total, $page, $size = 10)
+{
+    $totalPage = ceil($total/$size);
+    return Pagination2::create([
+        'total' => $totalPage, 
+        'current' => $page,
+        'centerSize' => 2,
+        'sideSize' => 1,
+        'firstText' => false,
+        'lastText' => false,
+    ]);
+}

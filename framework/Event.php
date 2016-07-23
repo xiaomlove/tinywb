@@ -113,13 +113,13 @@ class Event
     {
         if (empty(self::$events[$name]))
         {
-            return false;
+            return true;
         }
         krsort(self::$events[$name]);
         reset(self::$events[$name]);
         do 
         {
-            foreach (self::$events[$name] as $bind)
+            foreach (current(self::$events[$name]) as $bind)
             {
                 $result = call_user_func_array($bind['handler'], (array)$bind['data']);
                 if ($result === false)

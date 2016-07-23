@@ -40,13 +40,13 @@ return [
     
     //默认事件
     'default_events' => [
-        'APP_START',
-        'BEFORE_REQUEST',
-        'AFTER_REQUEST',
-        'BEFORE_CONTROLLER',
-        'AFTER_CONTROLLER',
-        'BEFORE_ACTION',
-        'AFTER_ACTION',
-        'APP_STOP',
+        'app:start',
+        'before:route',
+        'after:route',
+        'before:controller',
+        'after:controller',
+        'before:action',
+        'after:action',
+        'app:stop',
     ],
 ];

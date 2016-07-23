@@ -184,6 +184,7 @@ abstract class Model
             $sql .= $this->formatWhere($where);
         }
         if (!empty($orderby) && !empty($order)) {
+            $order = $this->getOrder($order);
             $sql .= " ORDER BY `$orderby` $order";
         }
         if (!empty($limit)) {
@@ -202,6 +203,7 @@ abstract class Model
             $sql .= $this->formatWhere($where);
         }
         if (!empty($orderby) && !empty($order)) {
+            $order = $this->getOrder($order);
             $sql .= " ORDER BY `$orderby` $order";
         }
         $sql .= " LIMIT 1";
@@ -257,6 +259,16 @@ abstract class Model
             $outStr .= " AND";
         }
         return rtrim($outStr, ' AND');
+    }
+    
+    private function getOrder($order = '')
+    {
+        if (empty($order))
+        {
+            return 'DESC';
+        }
+        $order = strtoupper($order);
+        return in_array($order, ['DESC', 'ASC']) ? $order : 'DESC';
     }
     
     protected function beginTransaction()

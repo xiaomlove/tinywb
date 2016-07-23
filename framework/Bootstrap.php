@@ -29,8 +29,6 @@ $loader->addNamespace('framework', __DIR__);
 //完成初始化之前才定义相关的常量、函数等。在此之前的都不依赖于它们，它们的定义依赖于框架初始化完
 require 'helpers/functions.php';
 
-// print_r($loader->getPrefixes());
-// print_r($loader->getClassMaps());
 
 
 
