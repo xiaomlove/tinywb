@@ -31,12 +31,15 @@ class Mysql implements DBInterface
         $dsn = $pocily['dsn'];
         $user = empty($pocily['user']) ? '' : $pocily['user'];
         $password = empty($pocily['password']) ? '' : $pocily['password'];
+        $beginConnectTime = microtime(true);
+        $this->allSql[] = sprintf('begin connect to %s at %f', $dsn, $beginConnectTime);
         $this->pdo = new \PDO($dsn, $user, $password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_TIMEOUT => 1,
             \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
             \PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        $this->allSql[] = sprintf('connect to %s success, cost time: %fs', $dsn, microtime(true) - $beginConnectTime);
     }
 
     public function getAttribute($attr = null)
@@ -72,7 +75,7 @@ class Mysql implements DBInterface
      */
     public function execute($sql, array $binds = [])
     {
-        $this->collectSql($sql, $binds);
+        $begin = microtime(true);
         try {
             $stat = $this->pdo->prepare($sql);
             if ($stat === false) {
@@ -80,6 +83,7 @@ class Mysql implements DBInterface
                 return false;
             }
             $result = $stat->execute($binds);
+            $this->collectSql($sql, microtime(true) - $begin, $binds);
             return $result === false ? false : $stat->rowCount();
         } catch (\PDOException $e) {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
@@ -94,13 +98,14 @@ class Mysql implements DBInterface
     */
     public function fetch($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
-        $this->collectSql($sql, $binds);
+        $begin = microtime(true);
         try {
             $stat = $this->pdo->prepare($sql);
             if ($stat === false) {
                 return false;
             }
             $result = $stat->execute($binds);
+            $this->collectSql($sql, microtime(true) - $begin, $binds);
             return $result === false ? false : $stat->fetch($fetchStyle);
         } catch (\PDOException $e) {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
@@ -115,13 +120,14 @@ class Mysql implements DBInterface
     */
     public function fetchAll($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
-        $this->collectSql($sql, $binds);
+        $begin = microtime(true);
         try {
             $stat = $this->pdo->prepare($sql);
             if ($stat === false) {
                 return false;
             }
             $result = $stat->execute($binds);
+            $this->collectSql($sql, microtime(true) - $begin, $binds);
             return $result === false ? false :$stat->fetchAll($fetchStyle);
         } catch (\PDOException $e) {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
@@ -136,13 +142,14 @@ class Mysql implements DBInterface
     */
     public function fetchColumn($sql, array $binds = [])
     {
-        $this->collectSql($sql, $binds);
+        $begin = microtime(true);
         try {
             $stat = $this->pdo->prepare($sql);
             if ($stat === false) {
                 return false;
             }
             $result = $stat->execute($binds);
+            $this->collectSql($sql, microtime(true) - $begin, $binds);
             return $result === false ? false : $stat->fetchColumn();
         } catch (\PDOException $e) {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
@@ -208,9 +215,10 @@ class Mysql implements DBInterface
         }
     }
     
-    private function collectSql($sql, array $binds)
+    private function collectSql($sql, $costTime, array $binds)
     {
-        $sql .= ' ---binds: ';
+        $costTime = number_format($costTime, 4);
+        $sql .= " ---cost time: {$costTime}s, binds: ";
         foreach ($binds as $name => $value) {
             $sql .= "$name => $value, ";
         }
