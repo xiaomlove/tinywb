@@ -13,3 +13,5 @@ Route::get('user/{id}/{age}.html', 'controllers\User@profile', ['id' => '[\d]+',
 Route::get('user/list', 'controllers\User@list');
 Route::get('user/welcome.html', 'controllers\User@welcome');
 Route::get('user/{name}', 'controllers\User@info');
+
+Route::get('tag/{tagName}', 'controllers\Index@tag');

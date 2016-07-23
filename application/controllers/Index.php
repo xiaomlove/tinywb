@@ -3,6 +3,7 @@ namespace controllers;
 
 use framework\Controller;
 use services\TopicService;
+use services\TagService;
 
 class Index extends Controller
 {
@@ -23,5 +24,10 @@ class Index extends Controller
             'newest' => $newest,
             'pagination' => getPagination($total, $page),
         ]);
+    }
+    
+    public function tag($tagName)
+    {
+        dump($tagName);
     }
 }

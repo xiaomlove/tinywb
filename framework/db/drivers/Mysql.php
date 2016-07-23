@@ -99,15 +99,24 @@ class Mysql implements DBInterface
     public function fetch($sql, array $binds = [], $fetchStyle = \PDO::FETCH_ASSOC)
     {
         $begin = microtime(true);
-        try {
+        try 
+        {
             $stat = $this->pdo->prepare($sql);
-            if ($stat === false) {
+            if ($stat === false) 
+            {
                 return false;
             }
-            $result = $stat->execute($binds);
+            $executeResult = $stat->execute($binds);
+            if ($executeResult === false)
+            {
+                return false;
+            }
+            $result = $stat->fetch($fetchStyle);
             $this->collectSql($sql, microtime(true) - $begin, $binds);
-            return $result === false ? false : $stat->fetch($fetchStyle);
-        } catch (\PDOException $e) {
+            return $result === false ? [] : $result;//不出错无结果也是false，不需要，需要空数组
+        } 
+        catch (\PDOException $e) 
+        {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
         }
         
@@ -126,9 +135,14 @@ class Mysql implements DBInterface
             if ($stat === false) {
                 return false;
             }
-            $result = $stat->execute($binds);
+            $executeResult = $stat->execute($binds);
+            if ($executeResult === false)
+            {
+                return false;
+            }
+            $result = $stat->fetchAll($fetchStyle);
             $this->collectSql($sql, microtime(true) - $begin, $binds);
-            return $result === false ? false :$stat->fetchAll($fetchStyle);
+            return $result;
         } catch (\PDOException $e) {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
         }
@@ -143,15 +157,24 @@ class Mysql implements DBInterface
     public function fetchColumn($sql, array $binds = [])
     {
         $begin = microtime(true);
-        try {
+        try 
+        {
             $stat = $this->pdo->prepare($sql);
-            if ($stat === false) {
+            if ($stat === false) 
+            {
                 return false;
             }
-            $result = $stat->execute($binds);
+            $executeResult = $stat->execute($binds);
+            if ($executeResult === false)
+            {
+                return false;
+            }
+            $result = $stat->fetchColumn();
             $this->collectSql($sql, microtime(true) - $begin, $binds);
-            return $result === false ? false : $stat->fetchColumn();
-        } catch (\PDOException $e) {
+            return $result === false ? [] : $result;
+        } 
+        catch (\PDOException $e) 
+        {
             throw new SQLException($e->getCode(), $e->getMessage(), $sql, $binds);
         }
        

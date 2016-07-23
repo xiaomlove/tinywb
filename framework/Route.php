@@ -161,12 +161,14 @@ class Route
             }
             $matched['map'] = $map;
             $matched['index'] = $k;
-            $matched['params'] = array_combine($params, array_slice($resultMatches, 1));
+            $paramsValue = array_slice($resultMatches, 1);
+            $matched['params'] = array_combine($params, $paramsValue);
             break;
         }
         if (empty($matched['map'])) {
             throw new RouteNotMatchException("can not match the URL from registered routes", $url, $urlPath, $maps);
         }
+        $this->injectParams($matched['params']);
         return $matched;
     }
     
