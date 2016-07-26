@@ -5,12 +5,12 @@ $config = [
     
     //命名空间，名称 => 路径
 	'namespaces' => [
-	    
+	    'providers' => APP_PATH . '/providers',
 	],
     
     //提供者，填写提供者完整类名
     'providers' => [
-        
+        'providers\SphinxProvider',
     ],
     
     'db' => [

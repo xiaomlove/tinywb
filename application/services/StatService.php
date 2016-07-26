@@ -7,9 +7,9 @@
 */
 namespace services;
 
-use models\Tag;
+use models\Stat;
 
-class TagService
+class StatService
 {
     public static function getById($id, $fields = '*')
     {
@@ -17,16 +17,16 @@ class TagService
         {
             return [];
         }
-        return Tag::model()->getOne($fields, ['id' => $id]);
+        return Stat::model()->getOne($fields, ['id' => $id]);
     }
     
-    public static function getByName($name, $fields = '*')
+    public static function getBykey($key, $fields = '*')
     {
-        if (empty($name))
+        if (empty($key))
         {
             return [];
         }
-        return Tag::model()->getOne($fields, ['name' => $name]);
+        return Stat::model()->getOne($fields, ['meta_key' => "'$key'"]);
     }
     
     public static function getByIdList(array $idList, $fields = '*', $orderby = '', $order = '')
@@ -36,11 +36,6 @@ class TagService
             return [];
         }
         $whereStr = sprintf("(%s)", implode(',', $idList));
-        return Tag::model()->getList($fields, ['id' => [$whereStr, 'IN']], $orderby, $order);
-    }
-    
-    public static function getTotal()
-    {
-        return Tag::model()->getTotal();
+        return Stat::model()->getList($fields, ['id' => [$whereStr, 'IN']], $orderby, $order);
     }
 }

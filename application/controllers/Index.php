@@ -3,6 +3,7 @@ namespace controllers;
 
 use framework\Controller;
 use services\TopicService;
+use services\StatService;
 use services\TagService;
 
 class Index extends Controller
@@ -13,7 +14,8 @@ class Index extends Controller
     {
         $page = $this->request->getParam('page');
         $page = empty($page) ? 1 : intval($page);
-        $total = 31420000;
+        $total = StatService::getBykey('topic_total');
+        $total = empty($total) ? 0 : $total['meta_value'];
         $per = 10;
         
         $list = TopicService::getHomeArticles($page, $per, 'publish_time', 'DESC');
@@ -22,6 +24,8 @@ class Index extends Controller
         return $this->display('index/index.php', [
             'list' => $list, 
             'newest' => $newest,
+            'tagTotal' => TagService::getTotal(),
+            'topicTotal' => $total,
             'pagination' => getPagination($total, $page),
         ]);
     }

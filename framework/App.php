@@ -138,10 +138,10 @@ final class App extends Container
         
         AppExceptionHandler::register();
         
-        $this->regiserProvider();
-
         $this->registerNamespace();
         
+        $this->regiserProvider();
+
         $this->registerRoute();
         
         $this->registerEvent();
