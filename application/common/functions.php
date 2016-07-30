@@ -27,3 +27,49 @@ function getPagination($total, $page, $size = 10)
         'lastText' => false,
     ]);
 }
+
+if (!function_exists('array_column'))
+{
+    function array_column(array $input, $columnKey, $indexKey = null)
+    {
+        $res = array();
+        if (empty($indexKey))
+        {
+            if (empty($columnKey))
+            {
+                return $input;
+            }
+            foreach ($input as $value)
+            {
+                if (isset($value[$columnKey]))
+                {
+                    $res[] = $value[$columnKey];
+                }
+            }
+        }
+        else
+        {
+            if (empty($columnKey))
+            {
+                foreach ($input as $value)
+                {
+                    if (isset($value[$indexKey]))
+                    {
+                        $res[$value[$indexKey]] = $value;
+                    }
+                }
+            }
+            else
+            {
+                foreach ($input as $value)
+                {
+                    if (isset($value[$indexKey]) && isset($value[$columnKey]))
+                    {
+                        $res[$value[$indexKey]] = $value[$columnKey];
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+}

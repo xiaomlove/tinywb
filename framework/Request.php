@@ -84,37 +84,37 @@ class Request
 		}
 	}
 	
-	public function getParam($name = null)
+	public function getParam($name = null, $default = null)
 	{
 	    if (is_null($name)) {
 	        return $this->param;
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->param[$name]) ? $this->param[$name] : null;
+	    return isset($this->param[$name]) ? $this->param[$name] : $default;
 	}
 	
-    public function getGet($name = null)
+    public function getGet($name = null, $default = null)
 	{
 	    if (is_null($name)) {
 	        return $this->get;
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->get[$name]) ? $this->get[$name] : null;
+	    return isset($this->get[$name]) ? $this->get[$name] : $default;
 	}
 	
-    public function getPost($name = null)
+    public function getPost($name = null, $default = null)
 	{
 	    if (is_null($name)) {
 	        return $this->post;
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->post[$name]) ? $this->post[$name] : null;
+	    return isset($this->post[$name]) ? $this->post[$name] : $default;
 	}
 	
-	public function getServer($name = null)
+	public function getServer($name = null, $default = null)
 	{
 	    if (is_null($name)) {
 	        return $this->server;
@@ -122,17 +122,17 @@ class Request
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
 	    $name = strtoupper($name);
-	    return isset($this->server[$name]) ? $this->server[$name] : null;
+	    return isset($this->server[$name]) ? $this->server[$name] : $default;
 	}
 	
-	public function getHeader($name = null)
+	public function getHeader($name = null, $default = null)
 	{
 	    if (is_null($name)) {
 	        return $this->header;
 	    } elseif (!is_string($name)) {
 	        throw new \InvalidArgumentException("Invalid name, must be a string.");
 	    }
-	    return isset($this->header[$name]) ? $this->header[$name] : null;
+	    return isset($this->header[$name]) ? $this->header[$name] : $default;
 	}
 	
 	private function initHeaders()
@@ -205,5 +205,11 @@ class Request
 	{
 	    $url = $this->isSSL ? 'https://' : 'http://';
 	    return $url . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	}
+	
+	public function getBaseUrl()
+	{
+	    $url = $this->isSSL ? 'https://' : 'http://';
+	    return $url . $_SERVER['HTTP_HOST'];
 	}
 }

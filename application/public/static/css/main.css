@@ -5,3 +5,5 @@
 .article .tags a {margin-right: 10px}
 
 .power-by {text-align: center;margin: 20px auto}
+
+.search-result-ul li {margin: 10px 0;border-bottom: 1px dotted #ddd}

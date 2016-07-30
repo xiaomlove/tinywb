@@ -16,8 +16,13 @@ class Test extends Controller
     {
         $sphinx = app('sphinx');
         $sphinx->setServer('120.24.175.25', 9312);
-        $sphinx->query('this', 'test1');
+//         $sphinx->setMatchMode(SPH_MATCH_PHRASE);
+//         $sphinx->setArrayResult(true);
+        $sphinx->setSortMode(SPH_SORT_EXTENDED, 'update_time DESC');
+        $sphinx->setLimits(0, 2, 50000000);
         
-        dump($sphinx);
+        $result = $sphinx->query('好', 'test1');
+        todump($sphinx->getLastError());
+        dump($result);
     }
 }

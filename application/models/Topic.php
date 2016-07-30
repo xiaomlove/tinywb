@@ -39,9 +39,9 @@ class Topic extends Model
     }
     
     
-    public function getList($field = '*', array $where = array(), $orderby = 'id', $order = 'DESC', $limit = '20')
+    public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '20')
     {
-        return $this->select(static::tableName(), $field, $where, $orderby, $order, $limit);
+        return $this->select(static::tableName(), $field, $where, $orderby, $order, empty($limit) ? 20 : $limit);
     }
     
 }

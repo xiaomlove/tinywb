@@ -16,6 +16,16 @@ class TopicService
         return static::getList('*', ['status' => Topic::STATUS_PUBLIC], 'publish_time', 'DESC', $numbers);
     }
     
+    public static function getByIdList(array $idList, $field = '*')
+    {
+        if (empty($idList) || !is_array($idList))
+        {
+            return [];
+        }
+        $whereStr = sprintf("(%s)", implode(',', $idList));
+        return static::getList($field, ['id' => [$whereStr, 'IN']]);
+    }
+    
     public static function getByTagName($tagName, $orderby = '', $order = '', $limit = 10)
     {
         if (empty($tagName))
@@ -46,7 +56,7 @@ class TopicService
         return static::getList('*', ['status' => Topic::STATUS_PUBLIC], $orderby, $order, $limit);
     }
     
-    private static function getList($field = '*', array $where = array(), $orderby = 'id', $order = 'DESC', $limit = '20')
+    private static function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
     {
         return Topic::model()->getList($field, $where, $orderby, $order, $limit);
     }
