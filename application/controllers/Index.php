@@ -25,8 +25,25 @@ class Index extends Controller
         $per = 10;
         
         $list = TopicService::getHomeArticles($page, $per, 'publish_time', 'DESC');
-        $newest = TopicService::getNewest(5);
+        if (!empty($list))
+        {
+            //取标签
+            $topicIdList = array_column($list, 'id');
+            $tagList = TagService::getByTopicIdList($topicIdList);
+            foreach ($list as &$value)
+            {
+                if (isset($tagList[$value['id']]))
+                {
+                    $value['tagList'] = $tagList[$value['id']];
+                }
+                else 
+                {
+                    $value['tagList'] = [];
+                }
+            }
+        }
         
+        $newest = TopicService::getNewest(5);
         return $this->display('index/index.php', [
             'list' => $list, 
             'newest' => $newest,
@@ -67,6 +84,7 @@ class Index extends Controller
         }
 //         dump($orderby, $orderText, $keyword, $offset, $page);
         $sphinx = app('sphinx');
+        $sphinx->setConnectTimeout(3);
         $sphinx->setServer('120.24.175.25', 9312);
 //         $sphinx->setMatchMode(SPH_MATCH_PHRASE);//整个查询看作一个词组
         $sphinx->setMaxQueryTime(5000);//最大查询时间，单位微秒

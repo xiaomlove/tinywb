@@ -15,7 +15,7 @@ class Tag extends Model
         return 'tag';
     }
     
-    public function getList($field = '*', array $where = [], $orderby = '', $order = '', $limit = '20')
+    public function getList($field = '*', array $where = [], $orderby = '', $order = '', $limit = '')
     {
         return $this->select(static::tableName(), $field, $where, $orderby, $order, $limit);
     }

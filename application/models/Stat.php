@@ -24,7 +24,7 @@ class Stat extends Model
         return 'stat';
     }
     
-    public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '20')
+    public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
     {
         return $this->select(static::tableName(), $field, $where, $orderby, $order, $limit);
     }
