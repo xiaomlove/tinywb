@@ -43,12 +43,12 @@ class Index extends Controller
             }
         }
         
-        $newest = TopicService::getNewest(5);
+//         $newest = TopicService::getNewest(5);
         return $this->display('index/index.php', [
             'list' => $list, 
-            'newest' => $newest,
-            'tagTotal' => TagService::getTotal(),
-            'topicTotal' => $total,
+//             'newest' => $newest,
+//             'tagTotal' => TagService::getTotal(),
+//             'topicTotal' => $total,
             'pagination' => getPagination($total, $page),
         ]);
     }

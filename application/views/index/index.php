@@ -31,17 +31,7 @@
            <nav><?php echo $pagination?></nav>
         </div>
         <div class="col-md-4">
-            <div>
-                <h2>最新文章</h2>
-                <ul>
-                    <?php if (!empty($newest)):?>
-                    <?php foreach ($newest as $item):?>
-                    <li><a href="#"><?php echo $item['title']?></a></li>
-                    <?php endforeach;?>
-                    <?php endif?>
-                </ul>
-            </div>
-            
+            <?php echo widgets\NewestArticle::widget()?>
             <div>
                 <h2>热门文章</h2>
                 <ul>
@@ -50,13 +40,7 @@
                 </ul>
             </div>
             
-            <div>
-                <h2>数据统计</h2>
-                <ul>
-                    <li>文章总数：<strong><?php echo $topicTotal?></strong></li>
-                    <li>标签总数：<strong><?php echo $tagTotal?></strong></li>
-                </ul>
-            </div>
+            <?php echo widgets\SideDataStat::widget()?>
             
             <div>
                 <h2>热门标签</h2>

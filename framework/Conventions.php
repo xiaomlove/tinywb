@@ -21,6 +21,10 @@ return [
     
     'default_layout_path' => APP_PATH . '/views/layouts',//默认布局文件目录
     
+    'default_widget_path' => APP_PATH . '/widgets',//默认widget目录
+
+    'default_widget_view_path' => APP_PATH . '/widgets/views',//默认widget视图目录
+    
     //默认命名空间
     'default_namespaces' => [
         'controllers' => APP_PATH . '/controllers',
