@@ -27,7 +27,7 @@ class TagService
         {
             return [];
         }
-        return Tag::model()->getOne($fields, ['name' => $name]);
+        return Tag::model()->getOne($fields, ['name' => "'$name'"]);
     }
     /**
      * 通过标签ID数组查找

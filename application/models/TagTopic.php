@@ -5,6 +5,8 @@ use framework\Model;
 
 class TagTopic extends Model
 {
+    const TABLE_NAME = 'topic_tag_map';
+    
     public function policyId()
     {
         return 'default';
@@ -12,7 +14,7 @@ class TagTopic extends Model
     
     public function tableName()
     {
-        return 'topic_tag_map';
+        return self::TABLE_NAME;
     }
     
     public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')

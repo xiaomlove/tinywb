@@ -162,6 +162,42 @@ class Index extends Controller
     
     public function tag($tagName)
     {
-        dump($tagName);
+        $tagInfo = TagService::getByName(urldecode($tagName));
+        
+        if (empty($tagInfo))
+        {
+            $data = "标签：{$tagName}不存在";
+        }
+        else 
+        {
+            $tagId = $tagInfo['id'];
+            $page = $this->request->getParam('page');
+            $page = empty($page) || !ctype_digit($page) ? 1 : intval($page);
+            $size = 10;
+            $offset = ($page - 1) * $size;
+            $total = TopicService::getCountsByTagId($tagId);
+            if ($total == 0)
+            {
+                $data = "没有结果";
+            }
+            else 
+            {
+                $list = TopicService::getListByTagId($tagId, "$offset, $size");
+                if (is_array($list))
+                {
+                    $data = $list;
+                }
+                else
+                {
+                    $data = "获取出错";
+                }
+            }
+        }
+        return $this->display('index/archive-tag.php', [
+            'tagInfo' => $tagInfo,
+            'total' => $total,
+            'list' => $data,
+            'pagination' => getPagination($total, $page, $size),
+        ]);
     }
 }

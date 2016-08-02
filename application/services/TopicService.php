@@ -18,7 +18,11 @@ class TopicService
     
     public static function getByIdList(array $idList, $field = '*')
     {
-        if (empty($idList) || !is_array($idList))
+        if (!is_array($idList))
+        {
+            throw new \InvalidArgumentException("Invalid idList, it should be an array");
+        }
+        elseif (empty($idList))
         {
             return [];
         }
@@ -26,34 +30,22 @@ class TopicService
         return static::getList($field, ['id' => [$whereStr, 'IN']]);
     }
     
-    public static function getByTagName($tagName, $orderby = '', $order = '', $limit = 10)
+    public static function getListByTagId($tagId, $limit = 10)
     {
-        if (empty($tagName))
+        if (empty($tagId) || !ctype_digit(strval($tagId)))
         {
-            return [];
+            throw new \InvalidArgumentException("Invalid tagId: $tagId");
         }
-        $tag = TagService::getByName($tagName, 'id');
-        if (empty($tag))
+        return Topic::model()->getListByTagId($tagId, $limit);
+    }
+    
+    public static function getCountsByTagId($tagId)
+    {
+        if (empty($tagId) || !ctype_digit(strval($tagId)))
         {
-            return [];
+            throw new \InvalidArgumentException("Invalid tagId: $tagId");
         }
-        $tagId = $tag['id'];
-        
-        //从关联表取topicId
-        $tagTopic = TagTopic::model()->getList('topic_id', ['tag_id' => $tagId], 'topic_id', 'DESC', $limit);
-        if (empty($tagTopic))
-        {
-            return [];
-        }
-        $topicIdList = array_column($tagTopic, 'topic_id');
-        
-        //还有状态，没法取的感觉！！！
-        
-        $where = [
-            'status' => Topic::STATUS_PUBLIC,
-            
-        ];
-        return static::getList('*', ['status' => Topic::STATUS_PUBLIC], $orderby, $order, $limit);
+        return Topic::model()->getCountsByTagId($tagId);
     }
     
     private static function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')

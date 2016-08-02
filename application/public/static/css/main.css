@@ -1,5 +1,7 @@
 @CHARSET "UTF-8";
 
+.jumbotron .display-3 a {text-decoration: none}
+
 .article {margin: 15px 0;border-bottom: 1px solid #f2f2f2}
 .article .date-time {margin-right: 10px}
 .article .tags a {margin-right: 10px}

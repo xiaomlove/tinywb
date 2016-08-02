@@ -3,7 +3,8 @@
       <h1 class="display-3"><a href="/">Hello, world!</a></h1>
       <p class="lead">本站是DEMO演示而已，文字看不懂、数据不完整都是正常的。</p>
       <hr class="m-y-md">
-      <form action="/search"><input name="keyword" size="8" placeholder="搜索" style="float: right"></form>
+      <strong><?php echo sprintf('标签：“%s”下的文章，一共找到%d篇', $tagInfo['name'], $total)?></strong>
+      <form action="/search" style="display: inline;float: right"><input name="keyword" size="8" placeholder="搜索"></form>
     </div>
     <div class="row">
         <div class="col-md-8">
@@ -16,7 +17,7 @@
                 <p>标签：
                     <span class="tags">
                         <?php foreach ($article['tagList'] as $tag):?>
-                        <a href="/tag/<?php echo $tag['name']?>"><?php echo $tag['name']?></a>
+                        <a href="#"><?php echo $tag['name']?></a>
                         <?php endforeach;?>
                     </span>
                 </p>
