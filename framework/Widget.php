@@ -8,11 +8,13 @@
 
 namespace framework;
 
+use framework\traits\PropertyCache;
+
 abstract class Widget
 {
-    protected $request;
+    use PropertyCache;
     
-    private static $widgets = [];
+    protected $request;
     
     protected function __construct()
     {
@@ -20,43 +22,6 @@ abstract class Widget
     }
     
     abstract public function run();
-    
-    private static function buildKey($param)
-    {
-        if ($param === true)
-        {
-            $key = 'true';
-        }
-        elseif ($param === false)
-        {
-            $key = 'false';
-        }
-        elseif (is_null($param))
-        {
-            $key = 'null';
-        }
-        elseif (is_scalar($param))
-        {
-            $key = strval($param);
-        }
-        elseif ($param instanceof \Closure)
-        {
-            return false;//不支持闭包
-        }
-        elseif (is_object($param))
-        {
-            $key = spl_object_hash($param);
-        }
-        elseif (is_array($param))
-        {
-            $key = serialize($param);
-        }
-        else 
-        {
-            return false;
-        }
-        return strtolower(get_called_class()) . '__' . $key;
-    }
     
     /**
      * 获取视图目录，如若要特殊化请在子类覆盖之。或者子类定义viewPath属性。
@@ -97,14 +62,11 @@ abstract class Widget
     
     public static function widget($param = null)
     {
-        $key = self::buildKey($param);
-        if ($key === false)
+        $key = self::buildParamKey($param);
+        $key = strtolower(get_called_class() . '_' . $key);
+        if (self::hasPropertyCache($key))
         {
-            throw new \InvalidArgumentException("Invalid param: " . print_r($param));
-        }
-        if (isset(self::$widgets[$key]))
-        {
-            return self::$widgets[$key];
+            return self::getPropertyCache($key);
         }
         $instance = new static();
         ob_start();
@@ -113,11 +75,13 @@ abstract class Widget
         if ($result === null)
         {
             //没有return，直接echo了。
-            return self::$widgets[$key] = $content;
+            self::setPropertyCache($key, $content);
+            return $content;
         }
         else 
         {
-            return self::$widgets[$key] = $result;
+            self::setPropertyCache($key, $result);
+            return $result;
         }
         
     }
