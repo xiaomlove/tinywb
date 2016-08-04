@@ -55,28 +55,13 @@ class Topic extends Model
                 FROM $topicTableName topic 
                 LEFT JOIN $mapTableName map 
                 ON topic.id = map.topic_id 
-                WHERE map.tag_id = $tagId AND topic.status = $topicStatus 
+                WHERE map.tag_id = $tagId 
                 ORDER BY map.id DESC";
         if (!empty($limit))
         {
             $sql .= " LIMIT " . strval($limit);
         }
         return $this->fetchAll($sql);
-    }
-    
-    public function getCountsByTagId($tagId)
-    {
-        $topicTableName = self::TABLE_NAME;
-        $mapTableName = TagTopic::model()->tableName();
-        $topicStatus = self::STATUS_PUBLIC;
-        $sql = "SELECT count(topic.id) as counts 
-                FROM $topicTableName topic 
-                LEFT JOIN $mapTableName map 
-                ON topic.id = map.topic_id 
-                WHERE map.tag_id = $tagId AND topic.status = $topicStatus";
-        
-        $result = $this->fetch($sql);
-        return empty($result) ? 0 : $result['counts'];
     }
     
 }

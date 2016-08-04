@@ -26,4 +26,9 @@ class TagTopic extends Model
     {
         return $this->selectOne(static::tableName(), $field, $where, $orderby, $order);
     }
+    
+    public function getTopicCountByTagId($tagId)
+    {
+        return $this->count(static::tableName(), ['tag_id' => $tagId]);
+    }
 }

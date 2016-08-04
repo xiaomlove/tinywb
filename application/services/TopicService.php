@@ -45,7 +45,7 @@ class TopicService
         {
             throw new \InvalidArgumentException("Invalid tagId: $tagId");
         }
-        return Topic::model()->getCountsByTagId($tagId);
+        return TagTopic::model()->getTopicCountByTagId($tagId);
     }
     
     private static function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
