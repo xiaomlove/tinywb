@@ -29,7 +29,7 @@ class Index extends Controller
         {
             //取标签
             $topicIdList = array_column($list, 'id');
-            $tagList = TagService::getByTopicIdList($topicIdList);
+            $tagList = TagService::getByTopicIdList(array_unique($topicIdList));
             foreach ($list as &$value)
             {
                 if (isset($tagList[$value['id']]))
@@ -185,6 +185,20 @@ class Index extends Controller
                 $list = TopicService::getListByTagId($tagId, "$offset, $size");
                 if (is_array($list))
                 {
+                    //取标签
+                    $topicIdList = array_column($list, 'id');
+                    $tagList = TagService::getByTopicIdList(array_unique($topicIdList));
+                    foreach ($list as &$value)
+                    {
+                        if (isset($tagList[$value['id']]))
+                        {
+                            $value['tagList'] = $tagList[$value['id']];
+                        }
+                        else
+                        {
+                            $value['tagList'] = [];
+                        }
+                    }
                     $data = $list;
                 }
                 else
