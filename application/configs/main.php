@@ -12,6 +12,7 @@ $config = [
     //提供者，填写提供者完整类名
     'providers' => [
         'providers\SphinxProvider',
+        'providers\SwooleClientProvider',
     ],
     
     'db' => [

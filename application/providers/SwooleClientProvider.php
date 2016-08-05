@@ -21,11 +21,11 @@ class SwooleClientProvider extends Provider
         {
             return self::$instance;
         }
-        if (!class_exists('swoole_client'))
+        if (!class_exists('\Swoole\Client'))
         {
-            throw new \RuntimeException('class swoole_client is not defined');
+            throw new \RuntimeException('\Swoole\Client is not defined');
         }
-        $client = new swoole_client();
+        $client = new \Swoole\Client();
         $client->connect('127.0.0.1', 9501, 1);
     
         return self::$instance = $client;
