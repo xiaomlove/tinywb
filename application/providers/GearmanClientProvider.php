@@ -26,7 +26,7 @@ class GearmanClientProvider extends Provider
             throw new \RuntimeException('\GearmanClient is not defined');
         }
         $client = new \GearmanClient();
-        $client->addServer('127.0.0.1', 4370);
+        $client->addServer('127.0.0.1', 4730);
     
         return self::$instance = $client;
     }
