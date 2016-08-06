@@ -29,6 +29,7 @@ class Test extends Controller
     public function swoole()
     {
         $swooleClient = app('swooleClient');
+        print_r($swooleClient);
         if (!$swooleClient->isConnected())
         {
             die('swoole client is not connected');

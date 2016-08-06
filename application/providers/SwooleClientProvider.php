@@ -25,7 +25,7 @@ class SwooleClientProvider extends Provider
         {
             throw new \RuntimeException('\Swoole\Client is not defined');
         }
-        $client = new \Swoole\Client();
+        $client = new \Swoole\Client(SWOOLE_SOCK_TCP);
         $client->connect('127.0.0.1', 9501, 1);
     
         return self::$instance = $client;
