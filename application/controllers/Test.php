@@ -28,27 +28,56 @@ class Test extends Controller
     
     public function swoole()
     {
+        $start = microtime(true);
         $swooleClient = app('swooleClient');
         print_r($swooleClient);
         if (!$swooleClient->isConnected())
         {
             die('swoole client is not connected');
         }
-        $result = $swooleClient->send(json_encode([
-            'class' => __CLASS__,
-            'method' => __METHOD__,
-            'time' => $_SERVER['REQUEST_TIME'],
-            'data' => 'send a test task',
-        ]));
-        var_dump($result);
+        for ($i = 0; $i < 10;$i++)
+        {
+            $result = $swooleClient->send(json_encode([
+                'time' => $_SERVER['REQUEST_TIME'],
+                'data' => 'send a test task---' . $i,
+            ]));
+        }
         if ($result)
         {
-            die('添加异步任务成功');
+            echo '添加10个异步任务成功';
         }
-        else 
+        else
         {
-            die('添加异步任务失败');
+            echo '添加异步任务失败';
         }
+        echo "<hr/>时间：" . (microtime(true) - $start);
         $swooleClient->close();
+        die("<br/>结束");
+    }
+    
+    
+    public function gearman()
+    {
+        $start = microtime(true);
+        $client = app('gearmanClient');
+        print_r($client);
+        echo '<br/>';
+        for ($i = 0; $i < 10; $i++)
+        {
+            $client->doBackground('test', json_encode([
+                'time' => $_SERVER['REQUEST_TIME'],
+                'data' => 'send a test task',
+            ]));
+            $resultCode = $client->returnCode();
+            if ($resultCode != GEARMAN_SUCCESS)
+            {
+                echo "failed at $i, code: $resultCode <br/>";
+            }
+            else
+            {
+                echo "success at $i, code: $resultCode </br>";
+            }
+        }
+        die("done, cost time: " . (microtime(true) - $start));
     }
 }

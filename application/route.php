@@ -18,3 +18,4 @@ Route::get('tag/{tagName}', 'controllers\Index@tag');
 Route::get('test', 'controllers\Test@index');
 Route::get('search', 'controllers\Index@search');
 Route::get('swoole', 'controllers\Test@swoole');
+Route::get('gearman', 'controllers\Test@gearman');

@@ -13,6 +13,7 @@ $config = [
     'providers' => [
         'providers\SphinxProvider',
         'providers\SwooleClientProvider',
+        'providers\GearmanClientProvider',
     ],
     
     'db' => [
