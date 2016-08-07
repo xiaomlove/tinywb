@@ -19,16 +19,15 @@
   <body>
     <div class="container-fluid">
     
-    <?php if ($statusCode === 404):?>
-    <h1 style="margin-top: 20%;text-align: center">404 NOT FOUND!</h1>
-    <?php else:?>
     <div style="margin: 15px;padding: 10px;border: 1px solid #ddd">
+    <h2><?php echo sprintf('[%s] %s in file: <code>%s</code> at line: <code>%s</code>', $errcode, $errtype, $errfile, $errline)?></h2>
+    <br/>
     <h1><?php echo $message?></h1>
     <p><?php echo $trace?></p>
     <h2>
-     the full URL is: <?php echo $fullUrl?>
-     <?php if (!empty($toMatchPath)):?>
-     , need to match path: <?php echo $toMatchPath?>
+     controllerAction: <?php echo $controllerAction?>
+     <?php if (!empty($params)):?>
+     , params: <?php print_r($params)?>
      <?php endif?>
     </h2>
     
@@ -38,7 +37,6 @@
             <tr>
                 <th>index</th>
                 <th>URL</th>
-                <th>controller@action</th>
                 <th>options</th>
                 <th>reason</th>
             </tr>
@@ -48,9 +46,8 @@
             <tr>
                 <td><?php echo $kk + 1?></td>
                 <td><?php echo $map['url']?></td>
-                <td><?php echo sprintf("%s@%s", $map['controller'], $map['action'])?></td>
                 <td><?php print_r($map['options'])?></td>
-                <td><?php echo empty($map['reason']) ? '' : $map['reason']?></td>
+                <td><?php echo $map['reason']?></td>
             </tr>
             <?php endforeach;?>
         </tbody>
@@ -59,7 +56,6 @@
     
 	<?php include 'tpl_common_running_info.php'?>
 	</div>
-	<?php endif?>
 	</div>
     <!-- jQuery first, then Bootstrap JS. -->
     <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>

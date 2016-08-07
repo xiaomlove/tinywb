@@ -54,7 +54,7 @@
             <ul class="list-unstyled search-result-ul">
                 <?php foreach ($data as $key => $value):?>
                 <li>
-                    <h3><?php echo $value['title']?></h3>
+                    <h3><a href="<?php echo url('controllers\Index@detail', ['id' => $value['id']])?>"><?php echo $value['title']?></a></h3>
                     <p>
                         <span>发表于：<?php echo date('Y-m-d H:i:s', $value['publish_time'])?></span>
                         <span>更新于：<?php echo date('Y-m-d H:i:s', $value['update_time'])?></span>

@@ -80,4 +80,10 @@ class Test extends Controller
         }
         die("done, cost time: " . (microtime(true) - $start));
     }
+    
+    public function url()
+    {
+        $url = url('controllers\User@profile', [ 'age' => 23,'id' => '34'], 'comment');
+        dump($url);
+    }
 }

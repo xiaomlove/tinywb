@@ -9,14 +9,15 @@
 use framework\Route;
 
 Route::get('/', 'controllers\Index@index');
-Route::get('user/{id}/{age}.html', 'controllers\User@profile', ['id' => '[\d]+', 'age' => '[\d]+']);
+Route::get('user/{id}/{age}.html', 'controllers\User@profile', ['id' => '/^[\d]+$/', 'age' => '/^[\d]+$/']);
 Route::get('user/list', 'controllers\User@list');
 Route::get('user/welcome.html', 'controllers\User@welcome');
 Route::get('user/{name}', 'controllers\User@info');
 
 Route::get('tag/{tagName}', 'controllers\Index@tag');
-Route::get('article/{id}.html', 'controllers\Index@detail', ['id' => '[\d]+']);
+Route::get('article/{id}.html', 'controllers\Index@detail', ['id' => '/^[\d]+$/']);
 Route::get('test', 'controllers\Test@index');
 Route::get('search', 'controllers\Index@search');
 Route::get('swoole', 'controllers\Test@swoole');
 Route::get('gearman', 'controllers\Test@gearman');
+Route::get('url', 'controllers\Test@url');

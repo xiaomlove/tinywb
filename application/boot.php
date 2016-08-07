@@ -17,6 +17,10 @@ $event->on('app:start', function() {
     require APP_PATH . '/common/functions.php';
 });
 
+$event->on('before:controller', function() {
+    todump('__clean');
+});
+
 $event->on('app:stop', function() {
     //往异步队列添加任务，如写访问日志。。。
 });

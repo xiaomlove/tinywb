@@ -9,6 +9,7 @@
 use framework\Config;
 use framework\App;
 use framework\exceptions\AppExceptionHandler;
+use framework\Route;
 
 /**
  * 打印变量
@@ -68,4 +69,16 @@ function app($key = null) {
         return $app[$key];
     }
     return null;
+}
+
+/**
+ * 创建url
+ * @param string $controllerAction
+ * @param array $params
+ * @param string $anchor
+ * @return Ambigous <string, mixed>
+ */
+function url($controllerAction, array $params = [], $anchor = '')
+{
+    return Route::getInstance()->createUrl($controllerAction, $params, $anchor);
 }

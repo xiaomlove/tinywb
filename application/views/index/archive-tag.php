@@ -17,7 +17,7 @@
                 <p>标签：
                     <span class="tags">
                         <?php foreach ($article['tagList'] as $tag):?>
-                        <a href="#"><?php echo $tag['name']?></a>
+                        <a href="<?php echo url('controllers\Index@tag', ['tagName' => $tag['name']])?>"><?php echo $tag['name']?></a>
                         <?php endforeach;?>
                     </span>
                 </p>

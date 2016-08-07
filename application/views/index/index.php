@@ -10,13 +10,13 @@
         <?php if (!empty($list)):?>
         <?php foreach ($list as $article):?>
             <article class="article">
-                <h2 class="title"><a href="/article/<?php echo $article['id']?>.html"><?php echo $article['title']?></a></h2>
-                <p>发表时间：<time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time></p>
+                <h2 class="title"><a href="<?php echo url('controllers\Index@detail', ['id' => $article['id']])?>"><?php echo $article['title']?></a></h2>
+                <p><small>发表时间：<time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time></small></p>
                 <?php if (!empty($article['tagList'])):?>
                 <p>标签：
                     <span class="tags">
                         <?php foreach ($article['tagList'] as $tag):?>
-                        <a href="/tag/<?php echo $tag['name']?>"><?php echo $tag['name']?></a>
+                        <a href="<?php echo url('controllers\Index@tag', ['tagName' => $tag['name']])?>"><?php echo $tag['name']?></a>
                         <?php endforeach;?>
                     </span>
                 </p>

@@ -4,10 +4,12 @@ namespace framework;
 
 use framework\traits\Singleton;
 use framework\exceptions\RouteNotMatchException;
+use framework\exceptions\UrlCanNotCreateException;
+use framework\traits\PropertyCache;
 
 class Route
 {
-    use Singleton;
+    use Singleton, PropertyCache;
     
     private static $routeMaps = [];//用于解析URL
     
@@ -107,7 +109,8 @@ class Route
     public function resolveUrl($url)
     {
         $urlPath = parse_url($url, PHP_URL_PATH);
-        if (empty($urlPath)) {
+        if (empty($urlPath)) 
+        {
             throw new RouteNotMatchException("Invalid URL, " . print_r($urlPath, true), $url);
         }
         $request = Request::getInstance();
@@ -115,57 +118,71 @@ class Route
         $urlPath = $urlAndLevel['url'];
         $level = $urlAndLevel['level'];
         $method = $request->getMethod();
-        if (empty(self::$routeMaps[$method][$level])) {
+        if (empty(self::$routeMaps[$method][$level])) 
+        {
             throw new RouteNotMatchException("No route match, method: '$method', level: $level", $url);
         }
         $maps = self::$routeMaps[$method][$level];
-        todump($maps);
-        todump($urlPath);
-        //dump();
         
         $matched = ['map' => '', 'method' => $method, 'params' => [], 'index' => 0, 'total' => count($maps)];
-        foreach ($maps as $k => &$map) {
-            if ($map['url'] === $urlPath) {
+        foreach ($maps as $k => &$map) 
+        {
+            if ($map['url'] === $urlPath) 
+            {
                 //直接等了，就是它了
                 $matched['map'] = $map;
                 $matched['index'] = $k;
                 break;
             }
-            $pattern = '/{(.+)}/U';//找参数，将之换为设定的验证与此正则，如果没有，换为[.+];
+            $pattern = '/{(.+)}/U';//找参数，全部换为[.+];
             $mapUrl = $map['url'];
             $paramsNum = preg_match_all($pattern, $mapUrl, $matches, PREG_SET_ORDER);
-            //todump($matches);
-            if (empty($paramsNum)) {
+            todump($matches);
+            if (empty($paramsNum)) 
+            {
                 //又不直接等，又没有参数，不可能，跳过
                 $map['reason'] = "not equal no param, '$mapUrl'   not match   '$pattern'";
                 continue;
             }
             $params = [];//参数数组
-            foreach ($matches as $paramInfo) {
+            foreach ($matches as $paramInfo) 
+            {
                 $params[] = $paramInfo[1];
-                if (!empty($map['options'][$paramInfo[1]])) {
-                    //该参数有正则验证规则
-                    $mapUrl = str_replace($paramInfo[0], '(' . $map['options'][$paramInfo[1]] . ')', $mapUrl);
-                } else {
-                    //没有设置正则验证
-                    $mapUrl = str_replace($paramInfo[0], '(.+)', $mapUrl);
-                }
+                $mapUrl = str_replace($paramInfo[0], '(.+)', $mapUrl);//如将{tagName}换为(.+)
             }
             $mapUrl = "|$mapUrl|";
             todump($mapUrl);
             $resultNum = preg_match($mapUrl, $urlPath, $resultMatches);
-            if ($resultNum === 0) {
+//             dump($resultMatches);
+            if ($resultNum === 0) 
+            {
                 //没戏
                 $map['reason'] = "'$urlPath' not match '$mapUrl'";
                 continue;
             }
+            $paramsValue = array_slice($resultMatches, 1);
+            //再逐个检查是否符合options中要要求
+            $keyValues = array_combine($params, $paramsValue);//组合url中的键和值，如id => 12, age =>23
+            foreach ($keyValues as $key => $value)
+            {
+                if (isset($map['options'][$key]))
+                {
+                    if (!preg_match($map['options'][$key], $value))
+                    {
+                        //没戏
+                        $map['reason'] = "key: {$key}'s value: $value not match '{$map['options'][$key]}'";
+                        continue 2;
+                    }
+                }
+            }
+            
             $matched['map'] = $map;
             $matched['index'] = $k;
-            $paramsValue = array_slice($resultMatches, 1);
-            $matched['params'] = array_combine($params, $paramsValue);
+            $matched['params'] = $keyValues;
             break;
         }
-        if (empty($matched['map'])) {
+        if (empty($matched['map'])) 
+        {
             throw new RouteNotMatchException("can not match the URL from registered routes", $url, $urlPath, $maps);
         }
         $this->injectParams($matched['params']);
@@ -190,4 +207,86 @@ class Route
         }
     }
     
+    public function createUrl($controllerAction, array $params = [], $anchor = '')
+    {
+        try
+        {
+            $url = self::createUrlFromRouteMapsFlip($controllerAction, $params, $anchor);
+        }
+        catch (UrlCanNotCreateException $e)
+        {
+            $e->output();
+        }
+        return $url;
+    }
+    
+    private static function createUrlFromRouteMapsFlip($controllerAction, array $params = [], $anchor = '')
+    {
+        if (!isset(self::$routeMapsFlip[$controllerAction]))
+        {
+            throw new \InvalidArgumentException("Invalid controllerAction: $controllerAction, not register yet.");
+        }
+        $routeMapsFlip = self::$routeMapsFlip[$controllerAction];
+        $url = '';
+        foreach ($routeMapsFlip as &$route)
+        {
+            if (strpos($route['url'], '{') === false)
+            {
+                //无参数，就是它了
+                $url = $route['url'];
+                break;
+            }
+            //否则，找参数
+            $findRouteParamsPattern = '|{([\w]+)}|';
+            $routeParamsNum = preg_match_all($findRouteParamsPattern, $route['url'], $routeParamsMatches);
+            todump($routeParamsNum, $routeParamsMatches);
+        
+            if (empty($routeParamsNum))
+            {
+                //有参数，却又无法匹配{}之类
+                $route['reason'] = "have params, but {$route['url']} not match '$findRouteParamsPattern'";
+                continue;
+            }
+            $routeParams = $routeParamsMatches[1];//得到url中的参数
+        
+            if ($routeParamsNum !== count($params))
+            {
+                //有参数，也找到了，但个数不一致
+                $route['reason'] = "have params, but num: $routeParamsNum != " . count($params);
+                continue;
+            }
+            $replace = [];//进行替换的值，为了保持顺序
+            foreach ($routeParams as $routeParam)
+            {
+                if (!isset($params[$routeParam]))
+                {
+                    $route['reason'] = "params not have the key: $routeParam";
+                    continue 2;//所需要参数不全，跳过
+                }
+                if (isset($route['options'][$routeParam]))
+                {
+                    //对参数有要求
+                    $optionPattern = $route['options'][$routeParam];
+                    if (!preg_match($optionPattern, $params[$routeParam]))
+                    {
+                        $route['reason'] = "{$routeParam}'s value '{$params[$routeParam]}' not match options pattern: $optionPattern";
+                        continue 2;//传递过来的数值通不过验证
+                    }
+                }
+                $replace[] = $params[$routeParam];
+            }
+            //成功得到
+            $url = str_replace($routeParamsMatches[0], $replace, $route['url']);
+        }
+        if (empty($url))
+        {
+            throw new UrlCanNotCreateException("url can not create !", $controllerAction, $params, $routeMapsFlip);
+        }
+        else
+        {
+            $baseUrl = Request::getInstance()->getBaseUrl();
+            $url = "$baseUrl/$url";
+            return empty($anchor) ? $url : $url . '#' . $anchor;
+        }
+    }
 }

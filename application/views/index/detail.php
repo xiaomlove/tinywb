@@ -10,12 +10,12 @@
         <?php if (!empty($article)):?>
             <article class="article">
                 <h2><?php echo $article['title']?></h2>
-                <p>
+                <p><small>
                     发表时间：
                     <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time>
                     更新时间：
                     <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['update_time'])?></time>
-                </p>
+                </small></p>
                 <p class="content"><?php echo $article['content']?></p>
                 <?php if (!empty($article['tagList'])):?>
                 <p>标签：
