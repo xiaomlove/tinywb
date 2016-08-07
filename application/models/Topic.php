@@ -40,6 +40,10 @@ class Topic extends Model
         return isset(self::$statusText[$status]) ? self::$statusText[$status] : '未知';
     }
     
+    public function getOne($field = '*', array $where = [], $orderby = '', $order = '')
+    {
+        return $this->selectOne(static::tableName(), $field, $where, $orderby, $order);
+    }
     
     public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
     {

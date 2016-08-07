@@ -3,6 +3,7 @@ namespace services;
 
 use models\Topic;
 use models\TagTopic;
+use models\TopicDetail;
 
 class TopicService
 {
@@ -14,6 +15,15 @@ class TopicService
     public static function getNewest($numbers = 5)
     {
         return static::getList('*', ['status' => Topic::STATUS_PUBLIC], 'publish_time', 'DESC', $numbers);
+    }
+    
+    public static function getById($id, $fields = '*')
+    {
+        if (empty($id) || !ctype_digit(strval($id)))
+        {
+            throw new \InvalidArgumentException("Invalid id, it should be an integer");
+        }
+        return Topic::model()->getOne($fields, ['id' => $id]);
     }
     
     public static function getByIdList(array $idList, $field = '*')
@@ -51,5 +61,31 @@ class TopicService
     private static function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
     {
         return Topic::model()->getList($field, $where, $orderby, $order, $limit);
+    }
+    
+    public static function getDetail($id)
+    {
+        if (empty($id) || !ctype_digit(strval($id)))
+        {
+            throw new \InvalidArgumentException("Invalid id, it should be an integer");
+        }
+        return TopicDetail::model()->getOne('*', ['topic_id' => $id]);
+    }
+    
+    public static function getTags($id)
+    {
+        if (empty($id) || !ctype_digit(strval($id)))
+        {
+            throw new \InvalidArgumentException("Invalid id, it should be an integer");
+        }
+        $result = TagService::getByTopicIdList([$id]);
+        if (empty($result))
+        {
+            return [];
+        }
+        else 
+        {
+            return $result[$id];
+        }
     }
 }

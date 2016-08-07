@@ -5,6 +5,9 @@
 .article {margin: 15px 0;border-bottom: 1px solid #f2f2f2}
 .article .date-time {margin-right: 10px}
 .article .tags a {margin-right: 10px}
+.article .title a {text-decoration: none;color: #000}
+.article .title a:hover {background-color: #ddd}
+.article .content {font-weight: 500}
 
 .power-by {text-align: center;margin: 20px auto}
 

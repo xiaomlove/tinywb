@@ -15,6 +15,7 @@ Route::get('user/welcome.html', 'controllers\User@welcome');
 Route::get('user/{name}', 'controllers\User@info');
 
 Route::get('tag/{tagName}', 'controllers\Index@tag');
+Route::get('article/{id}.html', 'controllers\Index@detail', ['id' => '[\d]+']);
 Route::get('test', 'controllers\Test@index');
 Route::get('search', 'controllers\Index@search');
 Route::get('swoole', 'controllers\Test@swoole');

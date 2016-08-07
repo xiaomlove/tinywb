@@ -1,12 +1,11 @@
 <?php
 namespace controllers;
 
-use framework\Controller;
 use services\TopicService;
 use services\StatService;
 use services\TagService;
 
-class Index extends Controller
+class Index extends Common
 {
     public $layout = 'main.php';
     
@@ -212,6 +211,37 @@ class Index extends Controller
             'total' => $total,
             'list' => $data,
             'pagination' => getPagination($total, $page, $size),
+        ]);
+    }
+    
+    public function detail($id)
+    {
+        if (empty($id) || !ctype_digit($id))
+        {
+            return $this->showInvalidParam();
+        }
+        
+        $topicInfo = TopicService::getById($id);
+        if (empty($topicInfo))
+        {
+            return $this->show404NotFound();
+        }
+        
+        $topicDetail = TopicService::getDetail($id);
+        if (empty($topicDetail))
+        {
+            $topicInfo['content'] = '还没有内容哟~.~';
+        }
+        else
+        {
+            $topicInfo['content'] = $topicDetail['content'];
+        }
+        
+        $topicTags = TopicService::getTags($id);
+        $topicInfo['tagList'] = $topicTags;
+        
+        return $this->display('index/detail.php', [
+            'article' => $topicInfo,
         ]);
     }
 }

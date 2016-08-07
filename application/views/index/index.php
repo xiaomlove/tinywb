@@ -10,7 +10,7 @@
         <?php if (!empty($list)):?>
         <?php foreach ($list as $article):?>
             <article class="article">
-                <h2><?php echo $article['title']?></h2>
+                <h2 class="title"><a href="/article/<?php echo $article['id']?>.html"><?php echo $article['title']?></a></h2>
                 <p>发表时间：<time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time></p>
                 <?php if (!empty($article['tagList'])):?>
                 <p>标签：
