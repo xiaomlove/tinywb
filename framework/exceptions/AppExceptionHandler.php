@@ -43,11 +43,17 @@ class AppExceptionHandler
      */
     public static function register()
     {
-        if (!App::getInstance()->isDebug) {
+        $app = App::getInstance();
+        if (!$app->isDebug) {
             error_reporting(0);
         } else {
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
+            
+            if ($app->isCli)
+            {
+                return true;
+            }
             
             $useFrameworkExceptionHandler = Config::get('use_framework_exception_handler');
             if ($useFrameworkExceptionHandler) {

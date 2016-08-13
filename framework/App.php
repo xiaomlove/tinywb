@@ -19,6 +19,8 @@ final class App extends Container
     
     private $isDebug;
     
+    private $isCli;
+    
     /**
      * 注册提供者
      * @throws \RuntimeException
@@ -130,7 +132,9 @@ final class App extends Container
 	    }
 	    $this->hadRun = true;
 	    
-	    $this->readonlyProperties = ['controller', 'action', 'isDebug'];
+	    $this->isCli = PHP_SAPI === 'cli' ? true : false;
+	    
+	    $this->readonlyProperties = ['controller', 'action', 'isDebug', 'isCli'];
 	    
         Config::init($config);
         
@@ -141,11 +145,14 @@ final class App extends Container
         $this->registerNamespace();
         
         $this->regiserProvider();
-
-        $this->registerRoute();
         
         $this->registerEvent();
         
+        if (!$this->isCli)
+        {
+            //CLI模式下不需要路由
+            $this->registerRoute();
+        }
         return $this;
 	}
 	
@@ -154,6 +161,10 @@ final class App extends Container
 	    if (!$this->hadRun)
 	    {
 	        return false;
+	    }
+	    if ($this->isCli)
+	    {
+	        return $this->handleCLI();
 	    }
 	    $event = Event::getInstance();
 	    $event->trigger('app:start');
@@ -244,5 +255,36 @@ final class App extends Container
 	    return $out;
 	}
 	
-
+    private function handleCLI()
+    {
+        $event = Event::getInstance();
+        $event->trigger('app:start');
+        
+        if ($_SERVER['argc'] < 2)
+        {
+            die('no controller@action');
+        }
+        
+        $controllerAction = $_SERVER['argv'][1];
+        if (substr_count($controllerAction, '@') !== 1)
+        {
+            die('error controllerAction format');
+        }
+        $controllerActionArr = explode('@', $controllerAction);
+        $controller = $controllerActionArr[0];
+        $action = $controllerActionArr[1];
+        if (!class_exists($controller))
+        {
+            die("controller: $controller is not exists.");
+        }
+        $event->trigger('before:controller');
+        $controllerObj = new $controller;
+        if (!method_exists($controllerObj, $action))
+        {
+            die("action: $action is not exists in controller: $controller");
+        }
+        $result = call_user_func_array([$controllerObj, $action], array_splice($_SERVER['argv'], 2));
+        $event->trigger('before:controller');
+        $event->trigger('app:stop');
+    }
 }
