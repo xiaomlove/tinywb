@@ -19,7 +19,7 @@ $event->on('app:start', function() {
 });
 
 $event->on('app:stop', function() {
-    echo 'app cli stop!';
+    echo "app cli stop! \n";
 });
 
 
