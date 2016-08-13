@@ -262,26 +262,26 @@ final class App extends Container
         
         if ($_SERVER['argc'] < 2)
         {
-            die('no controller@action');
+            die("no controller@action \n");
         }
         
         $controllerAction = $_SERVER['argv'][1];
         if (substr_count($controllerAction, '@') !== 1)
         {
-            die('error controllerAction format');
+            die("error controllerAction format \n");
         }
         $controllerActionArr = explode('@', $controllerAction);
         $controller = $controllerActionArr[0];
         $action = $controllerActionArr[1];
         if (!class_exists($controller))
         {
-            die("controller: $controller is not exists.");
+            die("controller: $controller is not exists \n");
         }
         $event->trigger('before:controller');
         $controllerObj = new $controller;
         if (!method_exists($controllerObj, $action))
         {
-            die("action: $action is not exists in controller: $controller");
+            die("action: $action is not exists in controller: $controller \n");
         }
         $result = call_user_func_array([$controllerObj, $action], array_splice($_SERVER['argv'], 2));
         $event->trigger('before:controller');
