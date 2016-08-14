@@ -21,6 +21,11 @@ class AsyncTaskProvider extends Provider
         };
     }
     
+    public static function getAllTask()
+    {
+        return array_keys(self::$taskText);
+    }
+    
     private function getGearmanClient()
     {
         if (self::$gearmanClient !== null)

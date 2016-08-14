@@ -20,7 +20,7 @@ class AsyncTaskWorker
     
     private function addFunctions()
     {
-        $functions = array_keys(self::$taskText);
+        $functions = providers\AsyncTaskProvider::getAllTask();
         foreach ($functions as $func)
         {
             $addResult = self::$worker->addFunction($func, function(\GearmanJob $job, $context) {
