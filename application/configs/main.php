@@ -14,6 +14,7 @@ $config = [
         'providers\SphinxProvider',
         'providers\SwooleClientProvider',
         'providers\GearmanClientProvider',
+        'providers\AsyncTaskProvider',
     ],
     
     'db' => [

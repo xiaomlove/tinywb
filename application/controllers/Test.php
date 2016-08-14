@@ -9,6 +9,7 @@
 namespace controllers;
 
 use framework\Controller;
+use providers\AsyncTaskProvider;
 
 class Test extends Controller
 {
@@ -85,5 +86,12 @@ class Test extends Controller
     {
         $url = url('controllers\User@profile', [ 'age' => 23,'id' => '34'], 'comment');
         dump($url);
+    }
+    
+    public function topicpv()
+    {
+        $asyncTask = app('asyncTask');
+        $r = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [1]);
+        var_dump($r);
     }
 }

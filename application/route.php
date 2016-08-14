@@ -21,3 +21,4 @@ Route::get('search', 'controllers\Index@search');
 Route::get('swoole', 'controllers\Test@swoole');
 Route::get('gearman', 'controllers\Test@gearman');
 Route::get('url', 'controllers\Test@url');
+Route::get('topicpv', 'controllers\Test@topicpv');
