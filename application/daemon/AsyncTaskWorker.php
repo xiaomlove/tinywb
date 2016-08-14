@@ -9,6 +9,10 @@ namespace daemon;
 
 use providers\AsyncTaskProvider;
 
+define('APP_PATH', dirname(__DIR__));
+
+require APP_PATH . '/providers/AsyncTaskProvider.php';
+
 class AsyncTaskWorker
 {
     private static $worker = null;
