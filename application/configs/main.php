@@ -7,6 +7,7 @@ $config = [
 	'namespaces' => [
 	    'providers' => APP_PATH . '/providers',
 	    'widgets' => APP_PATH . '/widgets',
+	    'daemon' => APP_PATH . '/daemon',
 	],
     
     //提供者，填写提供者完整类名

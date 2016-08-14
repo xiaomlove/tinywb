@@ -5,6 +5,7 @@ $config = [
 	'namespaces' => [
 	    'providers' => APP_PATH . '/providers',
 	    'cli' => APP_PATH . '/cli',
+	    'daemon' => APP_PATH . '/daemon',
 	],
     
     //提供者，填写提供者完整类名

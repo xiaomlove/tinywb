@@ -5,6 +5,9 @@
 * @link http://xiaomlove.com
 * @time 2016年8月14日    下午2:30:47
 */
+namespace daemon;
+
+use providers\AsyncTaskProvider;
 
 class AsyncTaskWorker
 {
@@ -20,7 +23,7 @@ class AsyncTaskWorker
     
     private function addFunctions()
     {
-        $functions = providers\AsyncTaskProvider::getAllTask();
+        $functions = AsyncTaskProvider::getAllTask();
         foreach ($functions as $func)
         {
             $addResult = self::$worker->addFunction($func, function(\GearmanJob $job, $context) {
