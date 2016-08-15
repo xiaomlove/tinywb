@@ -7,11 +7,7 @@
 */
 namespace daemon;
 
-use providers\AsyncTaskProvider;
-
 define('APP_PATH', dirname(__DIR__));
-
-require APP_PATH . '/providers/AsyncTaskProvider.php';
 
 class AsyncTaskWorker
 {
@@ -25,9 +21,25 @@ class AsyncTaskWorker
         $this->addFunctions();
     }
     
+    private static function getFunctions()
+    {
+        $functionsFile = APP_PATH . '/configs/asynctask-functions.php';
+        if (!is_file($functionsFile))
+        {
+            echo "not file $functionsFile \n";
+            return null;
+        }
+        return require $functionsFile;
+    }
+    
     private function addFunctions()
     {
-        $functions = AsyncTaskProvider::getAllTask();
+        $functions = self::getFunctions();
+        if (empty($functions) || !is_array($functions))
+        {
+            echo "no functions \n";
+            return;
+        }
         foreach ($functions as $func)
         {
             $addResult = self::$worker->addFunction($func, function(\GearmanJob $job, $context) {
@@ -61,7 +73,7 @@ class AsyncTaskWorker
             $className = $classMethodArr[0];
             $methodName = $classMethodArr[1];
             
-            $command = dirname(__DIR__) . "/cli/main.php " . implode(' ', $data);
+            $command = APP_PATH . "/cli/main.php " . implode(' ', $data);
             passthru($command, $result);
             return $result;
         }

@@ -7,11 +7,7 @@ class AsyncTaskProvider extends Provider
 {
     private static $gearmanClient = null;
     
-    const TASK_INCREASE_TOPIC_PV = 'cli\\Stat@updateTopicPv';
-    
-    private static $taskText = [
-        self::TASK_INCREASE_TOPIC_PV => '增加文章PV',
-    ];
+    private static $functions = null;
     
     public function register()
     {
@@ -21,9 +17,25 @@ class AsyncTaskProvider extends Provider
         };
     }
     
-    public static function getAllTask()
+    private static function getFunctions()
     {
-        return array_keys(self::$taskText);
+        if (self::$functions !== null)
+        {
+            return self::$functions;
+        }
+        $functionsFile = APP_PATH . '/configs/asynctask-functions.php';
+        if (!is_file($functionsFile))
+        {
+            throw new \RuntimeException("not file: $functionsFile \n");
+        }
+        $result = require $functionsFile;
+        return self::$functions = (array)$result;
+    }
+    
+    private static function isFunctionExists($funcName)
+    {
+        $functionsArr = self::getFunctions();
+        return in_array($funcName, $functionsArr);
     }
     
     private function getGearmanClient()
@@ -37,7 +49,7 @@ class AsyncTaskProvider extends Provider
     
     public function addTask($funcName, array $data, $priority = 'normal')
     {
-        if (!isset(self::$taskText[$funcName]))
+        if (!self::isFunctionExists($funcName))
         {
             throw new \InvalidArgumentException("Invalid param funcName: $funcName");
         }
