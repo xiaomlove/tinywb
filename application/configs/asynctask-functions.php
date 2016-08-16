@@ -1,5 +1,5 @@
 <?php
 return [
-    'cli\\Stat@updateTopicPv',
+    'cli\\Stat@increaseTopicPv',
     
 ];

@@ -12,7 +12,7 @@ use models\Stat as StatModel;
 
 class Stat extends StatModel
 {
-    public function updateTopicPv($topicId)
+    public function increaseTopicPv($topicId)
     {
         if (empty($topicId) || !ctype_digit($topicId))
         {

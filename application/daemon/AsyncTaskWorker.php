@@ -21,9 +21,9 @@ class AsyncTaskWorker
         $this->addFunctions();
     }
     
-    public function work()
+    public function getWorker()
     {
-        return self::$worker->work();
+        return self::$worker;
     }
     
     private static function getFunctions()
@@ -91,4 +91,4 @@ class AsyncTaskWorker
 
 
 $worker = new AsyncTaskWorker();
-while ($worker->work());
+while ($worker->getWorker()->work());
