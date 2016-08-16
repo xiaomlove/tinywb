@@ -8,9 +8,10 @@
 
 namespace cli;
 
+use framework\Cli;
 use models\Stat as StatModel;
 
-class Stat extends StatModel
+class Stat extends StatModel implements Cli
 {
     public function increaseTopicPv($topicId)
     {
@@ -20,7 +21,12 @@ class Stat extends StatModel
         }
         $key = "topic_pv_$topicId";
         $tableName = static::tableName();
-        $sql = "INSERT INTO $tableName VALUES (null, $key, 1) ON DUPLICATE UPDATE meta_value = meta_value + 1";
+        $sql = "INSERT INTO $tableName (id, meta_key, meta_value) VALUES (null, '$key', 1) ON DUPLICATE KEY UPDATE meta_value = meta_value + 1";
         return $this->execute($sql);
+    }
+    
+    public static function run($methodName, array $parameters = [])
+    {
+        
     }
 }

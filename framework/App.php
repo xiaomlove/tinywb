@@ -266,7 +266,7 @@ final class App extends Container
         }
         
         $controllerAction = $_SERVER['argv'][1];
-        if (substr_count($controllerAction, '@') !== 1)
+        if (mb_substr_count($controllerAction, '@') !== 1)
         {
             die("error controllerAction format \n");
         }
@@ -278,12 +278,26 @@ final class App extends Container
             die("controller: $controller is not exists \n");
         }
         $event->trigger('before:controller');
-        $controllerObj = new $controller;
-        if (!method_exists($controllerObj, $action))
+        if (!method_exists($controller, $action))
         {
             die("action: $action is not exists in controller: $controller \n");
         }
-        $result = call_user_func_array([$controllerObj, $action], array_splice($_SERVER['argv'], 2));
+        $reClass = new \ReflectionClass($controller);
+        $interface = 'framework\Cli';
+        if (!$reClass->implementsInterface($interface))
+        {
+            die("$controller has not implements interface : $interface \n");
+        }
+        $reMethod = new \ReflectionMethod($controller, $action);
+        if ($reMethod->isStatic())
+        {
+            $result = call_user_func_array([$controller, $action], array_splice($_SERVER['argv'], 2));
+        }
+        else
+        {
+            $controllerObj = call_user_func([$controller, 'getInstance']);
+            $result = call_user_func_array([$controllerObj, $action], array_splice($_SERVER['argv'], 2));
+        }
         $event->trigger('before:controller');
         $event->trigger('app:stop');
     }

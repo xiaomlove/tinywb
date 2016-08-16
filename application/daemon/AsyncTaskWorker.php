@@ -16,7 +16,7 @@ class AsyncTaskWorker
     public function __construct()
     {
         $worker = new \GearmanWorker();
-        $worker->addServer('127.0.0.1', 4370);
+        $worker->addServer('127.0.0.1', 4730);
         self::$worker = $worker;
         $this->addFunctions();
     }
@@ -71,14 +71,14 @@ class AsyncTaskWorker
         {
             return "error, empty funcName";
         }
-        if (mb_substr_count($funcName, '@') !== 1)
+        if (mb_substr_count($funcName, '@') === 1)
         {
             //类@方法
             $classMethodArr = explode('@', $funcName);
             $className = $classMethodArr[0];
             $methodName = $classMethodArr[1];
-            
-            $command = APP_PATH . "/cli/main.php " . implode(' ', $data);
+            $funcName = str_replace('\\', '\\\\', $funcName);//执行脚本时会被干掉一层，导致命名空间丢失
+            $command = 'sudo -u root php ' . APP_PATH . "/cli/main.php $funcName " . implode(' ', $data);
             passthru($command, $result);
             return $result;
         }

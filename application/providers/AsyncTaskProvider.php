@@ -56,22 +56,21 @@ class AsyncTaskProvider extends Provider
         {
             throw new \InvalidArgumentException("Invalid param funcName: $funcName");
         }
-        
+        $client = $this->getGearmanClient();
         switch ($priority)
         {
             case 'normal':
-                $jobHandle = $this->getGearmanClient()->doBackground($funcName, json_encode($data));
+                $jobHandle = $client->doBackground($funcName, json_encode($data));
                 break;
             case 'high':
-                $jobHandle = $this->getGearmanClient()->doHighBackground($funcName, json_encode($data));
+                $jobHandle = $client->doHighBackground($funcName, json_encode($data));
                 break;
             case 'low':
-                $jobHandle = $this->getGearmanClient()->doLowBackground($funcName, json_encode($data));
+                $jobHandle = $client->doLowBackground($funcName, json_encode($data));
                 break;
             default:
                 throw new \InvalidArgumentException("Invalid param priority: $priority");
         }
-        $client = $this->getGearmanClient();
         $returnCode = $client->returnCode();
         if ($returnCode !== GEARMAN_SUCCESS)
         {
