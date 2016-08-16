@@ -56,6 +56,7 @@ class AsyncTaskProvider extends Provider
         {
             throw new \InvalidArgumentException("Invalid param funcName: $funcName");
         }
+        
         switch ($priority)
         {
             case 'normal':
@@ -70,6 +71,15 @@ class AsyncTaskProvider extends Provider
             default:
                 throw new \InvalidArgumentException("Invalid param priority: $priority");
         }
-        return $jobHandle;
+        $client = $this->getGearmanClient();
+        $returnCode = $client->returnCode();
+        if ($returnCode !== GEARMAN_SUCCESS)
+        {
+            return $client->error() . PHP_EOL;
+        }
+        else
+        {
+            return __FUNCTION__ . " success, jobHandle: $jobHandle" . PHP_EOL;
+        }
     }
 }

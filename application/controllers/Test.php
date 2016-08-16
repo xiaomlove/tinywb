@@ -92,6 +92,6 @@ class Test extends Controller
     {
         $asyncTask = app('asyncTask');
         $r = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [1]);
-        var_dump($r);
+        die(var_dump($r));
     }
 }
