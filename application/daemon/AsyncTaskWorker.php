@@ -21,6 +21,11 @@ class AsyncTaskWorker
         $this->addFunctions();
     }
     
+    public function work()
+    {
+        return self::$worker->work();
+    }
+    
     private static function getFunctions()
     {
         $functionsFile = APP_PATH . '/configs/asynctask-functions.php';
