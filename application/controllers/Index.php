@@ -248,7 +248,7 @@ class Index extends Common
         
         return $this->display('index/detail.php', [
             'article' => $topicInfo,
-            'addTaskResult' => $addTaskResult，
+            'addTaskResult' => $addTaskResult,
         ]);
     }
 }
