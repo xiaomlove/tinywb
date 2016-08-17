@@ -25,8 +25,8 @@ class Stat extends StatModel implements Cli
         return $this->execute($sql);
     }
     
-    public static function run($methodName, array $parameters = [])
+    public static function getInstance()
     {
-        
+        return call_user_func([__CLASS__, 'model']);
     }
 }
