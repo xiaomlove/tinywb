@@ -4,6 +4,7 @@ namespace controllers;
 use services\TopicService;
 use services\StatService;
 use services\TagService;
+use providers\AsyncTaskProvider;
 
 class Index extends Common
 {
@@ -240,8 +241,14 @@ class Index extends Common
         $topicTags = TopicService::getTags($id);
         $topicInfo['tagList'] = $topicTags;
         
+        //添加异步任务统计PV
+        $asyncTask = app('asyncTask');
+        $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
+        
+        
         return $this->display('index/detail.php', [
             'article' => $topicInfo,
+            'addTaskResult' => $addTaskResult，
         ]);
     }
 }

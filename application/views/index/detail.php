@@ -17,6 +17,7 @@
                     <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['update_time'])?></time>
                 </small></p>
                 <p class="content"><?php echo $article['content']?></p>
+                <p class="text-summary"><?php echo $addTaskResult?></p>
                 <?php if (!empty($article['tagList'])):?>
                 <p>标签：
                     <span class="tags">

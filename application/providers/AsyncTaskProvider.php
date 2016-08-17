@@ -78,7 +78,7 @@ class AsyncTaskProvider extends Provider
         }
         else
         {
-            return __FUNCTION__ . " success, jobHandle: $jobHandle" . PHP_EOL;
+            return __CLASS__ . '---' . __FUNCTION__ . " run with $funcName success, jobHandle: $jobHandle" . PHP_EOL;
         }
     }
 }
