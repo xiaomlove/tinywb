@@ -10,6 +10,7 @@ namespace controllers;
 
 use framework\Controller;
 use providers\AsyncTaskProvider;
+use services\TopicService;
 
 class Test extends Controller
 {
@@ -90,8 +91,7 @@ class Test extends Controller
     
     public function topicpv()
     {
-        $asyncTask = app('asyncTask');
-        $r = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [1]);
-        die(var_dump($r));
+        $r = TopicService::getHotArticles();
+        dump($r);
     }
 }

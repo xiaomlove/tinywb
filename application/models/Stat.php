@@ -33,4 +33,11 @@ class Stat extends Model
     {
         return $this->selectOne(static::tableName(), $field, $where, $orderby, $order);
     }
+    
+    public function getPv($num = 5, $order = 'meta_value DESC')
+    {
+        $tableName = static::tableName();
+        $sql = "SELECT * FROM $tableName WHERE meta_key LIKE 'topic_pv_%' ORDER BY $order LIMIT $num";
+        return $this->fetchAll($sql);     
+    }
 }

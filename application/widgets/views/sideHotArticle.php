@@ -1,7 +1,10 @@
+<?php if (!empty($list)):?>
 <div>
     <h2>热门文章</h2>
     <ul>
-        <li><a href="#">张三跳楼了</a></li>
-        <li><a href="#">张三跳楼了</a></li>
+        <?php foreach ($list as $key => $value):?>
+        <li><a href="<?php echo url('controllers\Index@detail', ['id' => $value['id']])?>"><?php echo $value['title']?></a></li>
+        <?php endforeach;?>
     </ul>
 </div>
+<?php endif?>

@@ -4,6 +4,7 @@ namespace services;
 use models\Topic;
 use models\TagTopic;
 use models\TopicDetail;
+use models\Stat;
 
 class TopicService
 {
@@ -105,5 +106,35 @@ class TopicService
         {
             return $result['meta_value'] + 1;
         }
+    }
+    
+    public static function getHotArticles($num = 5)
+    {
+        $pvList = Stat::model()->getPv($num);
+        if (empty($pvList))
+        {
+            return [];
+        }
+        $idArr = [];
+        foreach ($pvList as $item)
+        {
+            $pos = mb_strrpos($item['meta_key'], '_');
+            $idArr[] = mb_substr($item['meta_key'], $pos + 1);
+        }
+        $articleList = self::getByIdList($idArr);
+        if (empty($articleList))
+        {
+            return [];
+        }
+        $articleList = array_column($articleList, null, 'id');
+        $out = [];
+        foreach ($idArr as $id)
+        {
+            if (isset($articleList[$id]))
+            {
+                $out[] = $articleList[$id];
+            }
+        }
+        return $out;
     }
 }
