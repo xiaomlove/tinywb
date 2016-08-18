@@ -15,6 +15,7 @@
                     <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['publish_time'])?></time>
                     更新时间：
                     <time class="date-time"><?php echo date('Y-m-d H:i:s', $article['update_time'])?></time>
+                    浏览量：<span><?php echo $article['pv']?></span>
                 </small></p>
                 <p class="content"><?php echo $article['content']?></p>
                 <p class="text-summary"><?php echo $addTaskResult?></p>

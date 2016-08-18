@@ -241,9 +241,20 @@ class Index extends Common
         $topicTags = TopicService::getTags($id);
         $topicInfo['tagList'] = $topicTags;
         
+        $pv = TopicService::getPv($id);
+        $topicInfo['pv'] = $pv;
+        
         //添加异步任务统计PV
-        $asyncTask = app('asyncTask');
-        $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
+        if (ENV === 'release')
+        {
+            $asyncTask = app('asyncTask');
+            $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
+        }
+        else
+        {
+            $addTaskResult = sprintf("当前环境为%s，不进行PV统计", ENV);
+        }
+        
         
         
         return $this->display('index/detail.php', [

@@ -88,4 +88,22 @@ class TopicService
             return $result[$id];
         }
     }
+    
+    public static function getPv($id)
+    {
+        if (empty($id) || !ctype_digit(strval($id)))
+        {
+            throw new \InvalidArgumentException("Invalid id, it should be an integer");
+        }
+        $key = "topic_pv_$id";
+        $result = StatService::getBykey($key);
+        if (empty($result))
+        {
+            return 1;
+        }
+        else 
+        {
+            return $result['meta_value'] + 1;
+        }
+    }
 }
