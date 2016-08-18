@@ -13,10 +13,6 @@ $loader = $app['autoload'];
 $loader->addNamespace('common', APP_PATH . '/common');
 
 //为事件添加一个绑定
-$event->on('app:start', function() {
-    require APP_PATH . '/common/functions.php';
-});
-
 $event->on('before:controller', function() {
     todump('__clean');
 });
@@ -26,5 +22,18 @@ $event->on('app:stop', function() {
 });
 
 
+//判断环境变量
+$config = $app['config'];
+$env = $config->get('env');
+if ($env === null)
+{
+    define('ENV', 'dev');
+}
+else
+{
+    define('ENV', $env);
+}
+
+require APP_PATH . '/common/functions.php';
 
 
