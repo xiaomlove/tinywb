@@ -10,12 +10,19 @@ namespace cli;
 
 use framework\Cli;
 use models\Stat as StatModel;
+use models\Tag;
 
 class Stat extends StatModel implements Cli
 {
+    /**
+     * 文章PV加1
+     * @param unknown $topicId
+     * @throws \InvalidArgumentException
+     * @return Ambigous <\framework\db\drivers\false, number>
+     */
     public function increaseTopicPv($topicId)
     {
-        if (empty($topicId) || !ctype_digit($topicId))
+        if (empty($topicId) || !ctype_digit(strval($topicId)))
         {
             throw new \InvalidArgumentException("Invalid param topicId: $topicId");
         }
@@ -24,6 +31,7 @@ class Stat extends StatModel implements Cli
         $sql = "INSERT INTO $tableName (id, meta_key, meta_value) VALUES (null, '$key', 1) ON DUPLICATE KEY UPDATE meta_value = meta_value + 1";
         return $this->execute($sql);
     }
+    
     
     public static function getInstance()
     {

@@ -90,4 +90,5 @@ class TagService
     {
         return Tag::model()->getTotal();
     }
+    
 }

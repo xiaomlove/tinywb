@@ -162,51 +162,74 @@ class Index extends Common
     
     public function tag($tagName)
     {
-        $tagInfo = TagService::getByName(urldecode($tagName));
+        $data = [];
+        $total = 0;
+        $page = 1;
+        $size = 10;
         
+        $tagInfo = TagService::getByName(urldecode($tagName));
         if (empty($tagInfo))
         {
             $data = "标签：{$tagName}不存在";
+            goto A;
         }
-        else 
+        $tagId = $tagInfo['id'];
+        $page = $this->request->getParam('page');
+        $page = empty($page) || !ctype_digit($page) ? 1 : intval($page);
+       
+        $offset = ($page - 1) * $size;
+        
+        //处理数量
+        if ($tagInfo['counts'] == 0)
         {
-            $tagId = $tagInfo['id'];
-            $page = $this->request->getParam('page');
-            $page = empty($page) || !ctype_digit($page) ? 1 : intval($page);
-            $size = 10;
-            $offset = ($page - 1) * $size;
+            //获取真实数据
             $total = TopicService::getCountsByTagId($tagId);
-            if ($total == 0)
+            if (empty($total))
             {
                 $data = "没有结果";
             }
-            else 
+            //没数量时，赶紧统计一下
+            app('asyncTask')->addTask(AsyncTaskProvider::TASK_UPDATE_TAG_TOPIC_COUNTS, [$tagId], 'low');
+        }
+        else 
+        {
+            $total = $tagInfo['counts'];
+            //有数据时，一定概率统计一下
+            if (mt_rand(1, 10) === 5)
             {
-                $list = TopicService::getListByTagId($tagId, "$offset, $size");
-                if (is_array($list))
-                {
-                    //取标签
-                    $topicIdList = array_column($list, 'id');
-                    $tagList = TagService::getByTopicIdList(array_unique($topicIdList));
-                    foreach ($list as &$value)
-                    {
-                        if (isset($tagList[$value['id']]))
-                        {
-                            $value['tagList'] = $tagList[$value['id']];
-                        }
-                        else
-                        {
-                            $value['tagList'] = [];
-                        }
-                    }
-                    $data = $list;
-                }
-                else
-                {
-                    $data = "获取出错";
-                }
+                app('asyncTask')->addTask(AsyncTaskProvider::TASK_UPDATE_TAG_TOPIC_COUNTS, [$tagId], 'low');
             }
         }
+        
+        //处理列表
+        if ($total)
+        {
+            $list = TopicService::getListByTagId($tagId, "$offset, $size");
+            if (is_array($list))
+            {
+                //取标签
+                $topicIdList = array_column($list, 'id');
+                $tagList = TagService::getByTopicIdList(array_unique($topicIdList));
+                foreach ($list as &$value)
+                {
+                    if (isset($tagList[$value['id']]))
+                    {
+                        $value['tagList'] = $tagList[$value['id']];
+                    }
+                    else
+                    {
+                        $value['tagList'] = [];
+                    }
+                }
+                $data = $list;
+            }
+            else
+            {
+                $data = "获取出错";
+            }
+        }
+        
+        A:
         return $this->display('index/archive-tag.php', [
             'tagInfo' => $tagInfo,
             'total' => $total,
@@ -245,17 +268,8 @@ class Index extends Common
         $topicInfo['pv'] = $pv;
         
         //添加异步任务统计PV
-        if (ENV === 'release')
-        {
-            $asyncTask = app('asyncTask');
-            $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
-        }
-        else
-        {
-            $addTaskResult = sprintf("当前环境为%s，不进行PV统计", ENV);
-        }
-        
-        
+        $asyncTask = app('asyncTask');
+        $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
         
         return $this->display('index/detail.php', [
             'article' => $topicInfo,

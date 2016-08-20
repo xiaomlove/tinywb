@@ -50,6 +50,7 @@ class TopicService
         return Topic::model()->getListByTagId($tagId, $limit);
     }
     
+    //获取某个标签下的文章数量。这是真实的数量
     public static function getCountsByTagId($tagId)
     {
         if (empty($tagId) || !ctype_digit(strval($tagId)))

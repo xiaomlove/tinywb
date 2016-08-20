@@ -7,6 +7,7 @@ $config = [
 	'namespaces' => [
 	    'providers' => APP_PATH . '/providers',
 	    'widgets' => APP_PATH . '/widgets',
+	    'cli' => APP_PATH . '/cli',
 	    'daemon' => APP_PATH . '/daemon',
 	],
     

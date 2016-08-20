@@ -7,6 +7,7 @@ class AsyncTaskProvider extends Provider
 {
     //为使用方便，将 configs/async-functions.php 中的函数也在这里定义一遍。
     const TASK_INCREASE_TOPIC_PV = 'cli\\Stat@increaseTopicPv';
+    const TASK_UPDATE_TAG_TOPIC_COUNTS= 'cli\\Tag@updateTopicCounts';
     
     private static $gearmanClient = null;
     
@@ -55,6 +56,10 @@ class AsyncTaskProvider extends Provider
         if (!self::isFunctionExists($funcName))
         {
             throw new \InvalidArgumentException("Invalid param funcName: $funcName");
+        }
+        if (ENV !== 'release')
+        {
+            return sprintf('当前环境为: %s, 不能添加异步任务', ENV);
         }
         $client = $this->getGearmanClient();
         switch ($priority)
