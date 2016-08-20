@@ -10,9 +10,8 @@ namespace cli;
 
 use framework\Cli;
 use models\Stat as StatModel;
-use models\Tag;
 
-class Stat extends StatModel implements Cli
+class Stat implements Cli
 {
     /**
      * 文章PV加1
@@ -26,15 +25,30 @@ class Stat extends StatModel implements Cli
         {
             throw new \InvalidArgumentException("Invalid param topicId: $topicId");
         }
-        $key = "topic_pv_$topicId";
-        $tableName = static::tableName();
-        $sql = "INSERT INTO $tableName (id, meta_key, meta_value) VALUES (null, '$key', 1) ON DUPLICATE KEY UPDATE meta_value = meta_value + 1";
-        return $this->execute($sql);
+        return StatModel::model()->increaseTopicPv($topicId);
+    }
+    
+    public function increaseTagHeatByViewTopic($tagId)
+    {
+        if (empty($tagId))
+        {
+            throw new \InvalidArgumentException("Invalid param tagId");
+        }
+        return StatModel::model()->increaseTagHeatByViewTopic((array)$tagId);        
+    }
+    
+    public function increaseTagHeatByViewTag($tagId)
+    {
+        if (empty($tagId))
+        {
+            throw new \InvalidArgumentException("Invalid param tagId");
+        }
+        return StatModel::model()->increaseTagHeatByViewTag((array)$tagId);
     }
     
     
     public static function getInstance()
     {
-        return call_user_func([__CLASS__, 'model']);
+        return new self;
     }
 }

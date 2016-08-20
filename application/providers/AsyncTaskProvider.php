@@ -8,6 +8,8 @@ class AsyncTaskProvider extends Provider
     //为使用方便，将 configs/async-functions.php 中的函数也在这里定义一遍。
     const TASK_INCREASE_TOPIC_PV = 'cli\\Stat@increaseTopicPv';
     const TASK_UPDATE_TAG_TOPIC_COUNTS= 'cli\\Tag@updateTopicCounts';
+    const TASK_INCREASE_TAG_HEAT_BY_VIEW_TOPIC = 'cli\\Stat@increaseTagHeatByViewTopic';
+    const TASK_INCREASE_TAG_HEAT_BY_VIEW_TAG = 'cli\\Stat@increaseTagHeatByViewTag';
     
     private static $gearmanClient = null;
     

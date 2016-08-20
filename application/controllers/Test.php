@@ -11,7 +11,8 @@ namespace controllers;
 use framework\Controller;
 use providers\AsyncTaskProvider;
 use services\TopicService;
-use cli\Tag as cliTag;
+use cli\Tag;
+use cli\Stat;
 
 class Test extends Controller
 {
@@ -92,7 +93,7 @@ class Test extends Controller
     
     public function topicpv()
     {
-        $r = cliTag::getInstance()->updateTopicCounts(1);
+        $r = Stat::getInstance()->increaseTopicPv(1);
         var_dump($r);
     }
 }
