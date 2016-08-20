@@ -75,7 +75,7 @@ class Stat extends Model
      */
     public function increaseTagHeatByViewTag(array $tagIdArr)
     {
-        return $this->increaseTagHeat($tagIdArr, self::KEY_TAG_HEAT_TAG_VIEW_PREFIX, 10);
+        return $this->increaseTagHeat($tagIdArr, self::KEY_TAG_HEAT_TAG_VIEW_PREFIX, 1);
     }
     
     private function increaseTagHeat(array $tagIdArr, $type, $value)
