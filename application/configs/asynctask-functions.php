@@ -2,6 +2,6 @@
 return [
     'cli\\Stat@increaseTopicPv',
     'cli\\Tag@updateTopicCounts',
-    'cli\\increaseTagHeatByViewTopic',
-    'cli\\increaseTagHeatByViewTag',
+    'cli\\Stat@increaseTagHeatByViewTopic',
+    'cli\\Stat@increaseTagHeatByViewTag',
 ];
