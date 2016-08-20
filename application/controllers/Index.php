@@ -173,6 +173,10 @@ class Index extends Common
             $data = "标签：{$tagName}不存在";
             goto A;
         }
+        //添加异步任务--增加标签热度
+        app('asyncTask')->addTask(AsyncTaskProvider::TASK_INCREASE_TAG_HEAT_BY_VIEW_TAG, [$tagInfo['id']]);
+        
+        
         $tagId = $tagInfo['id'];
         $page = $this->request->getParam('page');
         $page = empty($page) || !ctype_digit($page) ? 1 : intval($page);
@@ -267,9 +271,17 @@ class Index extends Common
         $pv = TopicService::getPv($id);
         $topicInfo['pv'] = $pv;
         
-        //添加异步任务统计PV
+        //添加异步任务--统计PV
         $asyncTask = app('asyncTask');
         $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TOPIC_PV, [$id]);
+        
+        //添加异步任务--增加标签热度
+        if (!empty($topicTags))
+        {
+            $tagIdArr = array_column($topicTags, 'id');
+            $addTaskResult = $asyncTask->addTask(AsyncTaskProvider::TASK_INCREASE_TAG_HEAT_BY_VIEW_TOPIC, $tagIdArr);
+        }
+        
         
         return $this->display('index/detail.php', [
             'article' => $topicInfo,
