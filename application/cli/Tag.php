@@ -25,6 +25,6 @@ class Tag extends TagModel implements Cli
             throw new \InvalidArgumentException("Invalid param tagId: $tagId");
         }
         $count = TagTopic::model()->getTopicCountByTagId($tagId);
-        return $this->update(static::tableName(), ['counts' => $count], ['id' => $tagId]);
+        return $this->update(['counts' => $count], ['id' => $tagId]);
     }
 }
