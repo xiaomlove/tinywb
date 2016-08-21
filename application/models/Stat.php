@@ -30,16 +30,6 @@ class Stat extends Model
         return 'stat';
     }
     
-    public function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
-    {
-        return $this->select(static::tableName(), $field, $where, $orderby, $order, $limit);
-    }
-    
-    public function getOne($field = '*', array $where = array(), $orderby = '', $order = '')
-    {
-        return $this->selectOne(static::tableName(), $field, $where, $orderby, $order);
-    }
-    
     public function getPv($num = 5, $order = 'meta_value DESC')
     {
         $tableName = static::tableName();

@@ -16,7 +16,7 @@ abstract class Model
     //以模型完整类名存储起来所有模型对象，模型对象是单例，不能直接new，通过静态方法model()获得对象
     private static $models = [];
     
-    protected function getDb()
+    private function getDb()
     {
         $policyId = static::policyId();
         if (empty($policyId) || !is_string($policyId)) {
@@ -55,20 +55,6 @@ abstract class Model
     
     abstract function tableName();
     
-    private function getTableName($tableName)
-    {
-        if (!empty($tableName)) {
-            return $tableName;
-        } else {
-            $tableName = static::tableName();
-            if (!empty($tableName) && is_string($tableName)) {
-                return $tableName;
-            } else {
-                throw new \RuntimeException("no pass parameter tableName or function tableName() no return valid string in " . get_called_class());
-            }
-        }
-    }
-    
     protected function execute($sql, array $binds = [])
     {
         return $this->getDb()->execute($sql, $binds);
@@ -93,6 +79,7 @@ abstract class Model
     {
         return $this->getDb()->fetchColumn($sql, $binds);
     }
+
     
     /**
      * 插入数据
@@ -103,8 +90,9 @@ abstract class Model
      *    ['name' => '小红', 'age' => 20, 'sex' => '女'],
      * ]
      */
-    protected function insert($table, array $fieldData)
+    public function insert(array $fieldData)
     {
+        $table = $this->getTableName();
         if (count($fieldData) === count($fieldData, true)) {
             $fieldData = array($fieldData);
         }
@@ -138,13 +126,14 @@ abstract class Model
         return $this->getDb()->execute($sql, $binds);
     }
     
-    protected function lastInsertId()
+    public function lastInsertId()
     {
         return $this->getDb()->lastInsertId();
     }
     
-    protected function delete($table, array $where, array $binds = [])
+    public function delete(array $where, array $binds = [])
     {
+        $table = $this->getTableName();
         if (empty($where)) {
             return false;
         }
@@ -152,8 +141,9 @@ abstract class Model
         return $this->getDb()->execute($sql, $binds);
     }
     
-    protected function update($table, array $fieldData, array $where, array $binds = [])
+    public function update(array $fieldData, array $where, array $binds = [])
     {
+        $table = $this->getTableName();
         if (empty($fieldData) || empty($where)) {
             return false;
         }
@@ -176,16 +166,16 @@ abstract class Model
      * @param array $binds
      * @return array|false
      */
-    protected function select($table, $fields = '*', array $where = [],  $orderby = '', $order = '', $limit = '', array $binds = [])
+    public  function getList($fields = '*', array $where = [], $order = '', $limit = '', array $binds = [])
     {
+        $table = $this->getTableName();
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
         $sql = "SELECT $fields FROM `$table`";
         if (!empty($where)) {
             $sql .= $this->formatWhere($where);
         }
-        if (!empty($orderby) && !empty($order)) {
-            $order = $this->getOrder($order);
-            $sql .= " ORDER BY `$orderby` $order";
+        if (!empty($order)) {
+            $sql .= " ORDER BY $order";
         }
         if (!empty($limit)) {
             $sql .= " LIMIT $limit";
@@ -194,27 +184,38 @@ abstract class Model
         return $this->getDb()->fetchAll($sql, $binds);
     }
     
-    protected function selectOne($table = '', $fields = '*', array $where = [], $orderby = '', $order = '', array $binds = [])
+    public function getOne($fields = '*', array $where = [], $order = '', array $binds = [])
     {
-        $table = $this->getTableName($table);
+        $table = $this->getTableName();
         $fields = is_array($fields) ? implode(',', $fields) : $fields;
         $sql = "SELECT $fields FROM `$table`";
         if (!empty($where)) {
             $sql .= $this->formatWhere($where);
         }
-        if (!empty($orderby) && !empty($order)) {
-            $order = $this->getOrder($order);
-            $sql .= " ORDER BY `$orderby` $order";
+        if (!empty($order)) {
+            $sql .= " ORDER BY $order";
         }
         $sql .= " LIMIT 1";
         return $this->getDb()->fetch($sql, $binds);
     }
     
-    protected function count($table, array $where, $field = '*', array $binds = [])
+    public function count(array $where, $field = '*', array $binds = [])
     {
+        $table = $this->getTableName();
         $sql = "SELECT count($field) as counts FROM `$table`" . $this->formatWhere($where) . " LIMIT 1";
         $result = $this->getDb()->fetch($sql, $binds);
         return empty($result) ? 0 : $result['counts'];
+    }
+    
+    private function getTableName()
+    {
+        $tableName = static::tableName();
+        $className = get_called_class();
+        if (empty($tableName))
+        {
+            throw new \RuntimeException("can't get tableName, model: $className may not supply the function named: tableName()");
+        }
+        return $tableName;
     }
     
     public function lastSql()
@@ -259,16 +260,6 @@ abstract class Model
             $outStr .= " AND";
         }
         return rtrim($outStr, ' AND');
-    }
-    
-    private function getOrder($order = '')
-    {
-        if (empty($order))
-        {
-            return 'DESC';
-        }
-        $order = strtoupper($order);
-        return in_array($order, ['DESC', 'ASC']) ? $order : 'DESC';
     }
     
     protected function beginTransaction()

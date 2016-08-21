@@ -24,7 +24,7 @@ class Index extends Common
         $total = empty($total) ? 0 : $total['meta_value'];
         $per = 10;
         
-        $list = TopicService::getHomeArticles($page, $per, 'publish_time', 'DESC');
+        $list = TopicService::getHomeArticles($page, $per, 'publish_time DESC');
         if (!empty($list))
         {
             //取标签

@@ -39,13 +39,13 @@ class StatService
         return $result;
     }
     
-    public static function getByIdList(array $idList, $fields = '*', $orderby = '', $order = '')
+    public static function getByIdList(array $idList, $fields = '*', $order = '')
     {
         if (empty($idList) || !is_array($idList))
         {
             return [];
         }
         $whereStr = sprintf("(%s)", implode(',', $idList));
-        return Stat::model()->getList($fields, ['id' => [$whereStr, 'IN']], $orderby, $order);
+        return Stat::model()->getList($fields, ['id' => [$whereStr, 'IN']], $order);
     }
 }

@@ -8,14 +8,14 @@ use models\Stat;
 
 class TopicService
 {
-    public static function getHomeArticles($page, $pageSize, $orderby, $order)
+    public static function getHomeArticles($page, $pageSize, $order)
     {
-        return static::getList('*', ['status' => Topic::STATUS_PUBLIC], $orderby, $order, ($page - 1) * $pageSize . ",$pageSize");
+        return static::getList('*', ['status' => Topic::STATUS_PUBLIC], $order, ($page - 1) * $pageSize . ",$pageSize");
     }
     
     public static function getNewest($numbers = 5)
     {
-        return static::getList('*', ['status' => Topic::STATUS_PUBLIC], 'publish_time', 'DESC', $numbers);
+        return static::getList('*', ['status' => Topic::STATUS_PUBLIC], 'publish_time DESC', $numbers);
     }
     
     public static function getById($id, $fields = '*')
@@ -60,9 +60,9 @@ class TopicService
         return TagTopic::model()->getTopicCountByTagId($tagId);
     }
     
-    private static function getList($field = '*', array $where = array(), $orderby = '', $order = '', $limit = '')
+    private static function getList($field = '*', array $where = array(), $order = '', $limit = '')
     {
-        return Topic::model()->getList($field, $where, $orderby, $order, $limit);
+        return Topic::model()->getList($field, $where, $order, $limit);
     }
     
     public static function getDetail($id)
