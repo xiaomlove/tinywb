@@ -81,4 +81,9 @@ class TopService
             return false;
         }
     }
+    
+    public static function getHotTags($num)
+    {
+        return Top::model()->getHotTags($num);        
+    }
 }
