@@ -23,7 +23,7 @@ class Top extends Model
         $topTableName = static::tableName();
         $tagTableName = Tag::model()->tableName();
         $type = self::TYPE_HOT_TAG;
-        $sql = "SELECT tag.* FROM $topTableName as top LEFT JOIN $tagTableName as tag 
+        $sql = "SELECT tag.*, top.dateline FROM $topTableName as top LEFT JOIN $tagTableName as tag 
                 ON top.target = tag.id WHERE top.type = $type 
                 ORDER BY top.weigh DESC";
         if (!empty($num))
