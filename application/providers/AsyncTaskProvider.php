@@ -10,6 +10,7 @@ class AsyncTaskProvider extends Provider
     const TASK_UPDATE_TAG_TOPIC_COUNTS= 'cli\\Tag@updateTopicCounts';
     const TASK_INCREASE_TAG_HEAT_BY_VIEW_TOPIC = 'cli\\Stat@increaseTagHeatByViewTopic';
     const TASK_INCREASE_TAG_HEAT_BY_VIEW_TAG = 'cli\\Stat@increaseTagHeatByViewTag';
+    const TASK_UPDATE_HOT_TAGS = 'cli\\Top@updateHotTags';
     
     private static $gearmanClient = null;
     
@@ -53,7 +54,7 @@ class AsyncTaskProvider extends Provider
         return self::$gearmanClient = app('gearmanClient');
     }
     
-    public function addTask($funcName, array $data, $priority = 'normal')
+    public function addTask($funcName, array $data = [], $priority = 'normal')
     {
         if (!self::isFunctionExists($funcName))
         {

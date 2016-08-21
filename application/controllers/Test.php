@@ -13,6 +13,8 @@ use providers\AsyncTaskProvider;
 use services\TopicService;
 use cli\Tag;
 use cli\Stat;
+use services\TagService;
+use services\TopService;
 
 class Test extends Controller
 {
@@ -93,7 +95,7 @@ class Test extends Controller
     
     public function topicpv()
     {
-        $r = Stat::getInstance()->increaseTopicPv(1);
+        $r = app('asyncTask')->addTask(AsyncTaskProvider::TASK_UPDATE_HOT_TAGS);
         var_dump($r);
     }
 }

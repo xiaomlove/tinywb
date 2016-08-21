@@ -4,4 +4,5 @@ return [
     'cli\\Tag@updateTopicCounts',
     'cli\\Stat@increaseTagHeatByViewTopic',
     'cli\\Stat@increaseTagHeatByViewTag',
+    'cli\\Top@updateHotTags',
 ];

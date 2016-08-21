@@ -262,17 +262,17 @@ abstract class Model
         return rtrim($outStr, ' AND');
     }
     
-    protected function beginTransaction()
+    public function beginTransaction()
     {
         return $this->getDb()->beginTransaction();
     }
     
-    protected function commit()
+    public function commit()
     {
         return $this->getDb()->commit();
     }
     
-    protected function rollBack()
+    public function rollBack()
     {
         return $this->getDb()->rollBack();
     }

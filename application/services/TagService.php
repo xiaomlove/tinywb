@@ -9,6 +9,7 @@ namespace services;
 
 use models\Tag;
 use models\TagTopic;
+use models\Stat;
 
 class TagService
 {
@@ -89,6 +90,31 @@ class TagService
     public static function getTotal()
     {
         return Tag::model()->getTotal();
+    }
+    
+    public static function getByHeatOfViewTag($num)
+    {
+        return Stat::model()->getTagByHeatOfViewTag(intval($num));
+    }
+    
+    public static function getByHeatOfViewTopic($num)
+    {
+        return Stat::model()->getTagByHeatOfViewTopic(intval($num));
+    }
+    
+    public static function getByHeatOfTopicCounts($num)
+    {
+        $result = Tag::model()->getList('id, counts', [], 'counts DESC', $num);
+        if (empty($result))
+        {
+            return [];
+        }
+        $out = [];
+        foreach ($result as $item)
+        {
+            $out[$item['id']] = ['tag_id' => $item['id'], 'weigh' => $item['counts']];
+        }
+        return $out;
     }
     
 }
