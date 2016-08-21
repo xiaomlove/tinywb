@@ -19,6 +19,6 @@ class TagTopic extends Model
     
     public function getTopicCountByTagId($tagId)
     {
-        return $this->count(static::tableName(), ['tag_id' => $tagId]);
+        return $this->count(['tag_id' => $tagId]);
     }
 }
