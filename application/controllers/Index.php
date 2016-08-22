@@ -298,7 +298,10 @@ class Index extends Common
     public function consoleSubmit()
     {
         $code = $this->request->getPost('code');
-        $code = preg_replace('/<\?php|\?>|[\s]+/', '', $code);
+        $code = preg_replace('/<\?php|\?>|[\r\n\t]+/', '', $code);
+        $errSet = 'error_reporting(E_ALL);ini_set(\'display_errors\', 1);';
+        $code = $errSet . 'try{' . $code . '}catch(\Exception $e){die($e->getMessage() . \'ss\');}';
+        $code .= 'finally{$err=error_get_last();if(!empty($err)){print_r($err);}}'; 
 //         var_dump($code);die;
         ob_start();
         $result = eval($code);
