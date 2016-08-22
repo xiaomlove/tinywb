@@ -21,4 +21,12 @@ class Common extends Controller
     {
         return $this->display('common/404-not-found.php');
     }
+    
+    public function runCli($controllerAction, $data)
+    {
+        $command = 'sudo -u root php ' . APP_PATH . "/cli/main.php $controllerAction " . implode(' ', $data);
+        passthru($command, $result);
+        return $result;
+    }
+    
 }

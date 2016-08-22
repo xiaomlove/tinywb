@@ -5,6 +5,7 @@ use services\TopicService;
 use services\StatService;
 use services\TagService;
 use providers\AsyncTaskProvider;
+use framework\db\DB;
 
 class Index extends Common
 {
@@ -287,5 +288,29 @@ class Index extends Common
             'article' => $topicInfo,
             'addTaskResult' => $addTaskResult,
         ]);
+    }
+    
+    public function console()
+    {
+        return $this->display('index/console.php');
+    }
+    
+    public function consoleSubmit()
+    {
+        $code = $this->request->getPost('code');
+        $code = preg_replace('/<\?php|\?>|[\s]+/', '', $code);
+//         var_dump($code);die;
+        ob_start();
+        $result = eval($code);
+        $content = ob_get_clean();
+        if (empty($result))
+        {
+            $out = $content;
+        }
+        else 
+        {
+            $out = $result;
+        }
+        var_dump($out);die;
     }
 }

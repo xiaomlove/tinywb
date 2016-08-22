@@ -107,6 +107,11 @@ class AppExceptionHandler
      */
     public static function shutdownFunction($showRunningInfo = false)
     {
+        $request = Request::getInstance();
+        if ($request->isAjax())
+        {
+            return;
+        }
        $errInfo = error_get_last();
        if (!empty($errInfo)) {
            //echo "<hr/>shutdownFunction: " . self::$errLevels[$errInfo['type']] . "---{$errInfo['message']}---in file: {$errInfo['file']}--- at line: {$errInfo['line']} </hr>";

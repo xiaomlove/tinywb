@@ -126,5 +126,18 @@ abstract class Controller
             return '';
         }
     }
+    
+    public function outJson($code = 0, $msg = 'OK', $data = [], $statusCode = 200, array $headers = [])
+    {
+        $out = [
+            'code' => $code,
+            'msg' => $msg,
+            'data' => (array)$data,
+            'timestamp' => $_SERVER['REQUEST_TIME'],
+            'usetime' => microtime(true) - APP_START_TIME,
+        ];
+        var_dump($out);die;
+        return new Response($out, $statusCode, $headers);
+    }
 }
 
