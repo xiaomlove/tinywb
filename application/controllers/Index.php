@@ -259,7 +259,7 @@ class Index extends Common
         $topicDetail = TopicService::getDetail($id);
         if (empty($topicDetail))
         {
-            $topicInfo['content'] = '还没有内容哟~.~';
+            $topicInfo['content'] = '还没有内容哟~.~<a href="' . url('controllers\Index@edit', ['id' => $id]) . '">[编辑]</a>';
         }
         else
         {
@@ -315,5 +315,30 @@ class Index extends Common
             $out = $result;
         }
         var_dump($out);die;
+    }
+    
+    public function edit($id)
+    {
+        if (empty($id) || !ctype_digit($id))
+        {
+            return $this->showInvalidParam();
+        }
+        
+        $topicInfo = TopicService::getById($id);
+        if (empty($topicInfo))
+        {
+            return $this->show404NotFound();
+        }
+        
+        $topicDetail = TopicService::getDetail($id);
+        
+        $topicTags = TopicService::getTags($id);
+        
+        $topicInfo['detail'] = $topicDetail;
+        $topicInfo['tags'] = $topicTags;
+        
+        return $this->display('index/edit.php', [
+            'info' => $topicInfo, 
+        ]);
     }
 }

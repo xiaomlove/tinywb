@@ -16,6 +16,7 @@ Route::get('user/{name}', 'controllers\User@info');
 
 Route::get('tag/{tagName}', 'controllers\Index@tag');
 Route::get('article/{id}.html', 'controllers\Index@detail', ['id' => '/^[\d]+$/']);
+Route::get('edit/{id}', 'controllers\Index@edit', ['id' => '/^[\d]+$/']);
 Route::get('console', 'controllers\Index@console');
 Route::post('console', 'controllers\Index@consoleSubmit');
 Route::get('test', 'controllers\Test@index');
