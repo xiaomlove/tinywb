@@ -76,7 +76,7 @@
     <table>
         <tbody>
             <?php foreach ($_REQUEST as $key => $value):?>
-            <tr><td width="100px"><?php echo $key?></td><td><?php echo $value?></td></tr>
+            <tr><td width="100px"><?php echo $key?></td><td><?php print_r($value)?></td></tr>
             <?php endforeach;?>
         </tbody>
     </table>
@@ -96,7 +96,7 @@
     <table>
         <tbody>
             <?php foreach ($_POST as $key => $value):?>
-            <tr><td width="100px"><?php echo $key?></td><td><?php echo $value?></td></tr>
+            <tr><td width="100px"><?php echo $key?></td><td><?php print_r($value)?></td></tr>
             <?php endforeach;?>
         </tbody>
     </table>
