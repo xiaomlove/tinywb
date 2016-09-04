@@ -13,9 +13,9 @@
 
 .search-result-ul li {margin: 10px 0;border-bottom: 1px dotted #ddd}
 
-.tag {background-color: bisque;margin: 5px; padding: 5px}
-.tag .fa-trash-o {margin-left: 5px;cursor: pointer;color: #d9534f;}
-
+.ul-tag .tag {background-color: bisque;margin: 5px; padding: 5px}
+.ul-tag .tag .fa-trash-o {margin-left: 5px;cursor: pointer;color: #d9534f;}
+.ul-tag .tag-new {background-color: darkkhaki}
 
 
 #editor {min-height: 400px}

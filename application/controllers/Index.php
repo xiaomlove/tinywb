@@ -341,4 +341,9 @@ class Index extends Common
             'info' => $topicInfo, 
         ]);
     }
+    
+    public function editSubmit($id)
+    {
+        dump($_POST);
+    }
 }
