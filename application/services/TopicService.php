@@ -6,7 +6,7 @@ use models\TagTopic;
 use models\TopicDetail;
 use models\Stat;
 
-class TopicService
+class TopicService extends Service
 {
     public static function getHomeArticles($page, $pageSize, $order)
     {
@@ -71,7 +71,8 @@ class TopicService
         {
             throw new \InvalidArgumentException("Invalid id, it should be an integer");
         }
-        return TopicDetail::model()->getOne('*', ['topic_id' => $id]);
+        $result = TopicDetail::model()->getOne('*', ['topic_id' => $id]);
+        return !empty($result['content']) ? $result['content'] : '';
     }
     
     public static function getTags($id)
@@ -138,4 +139,97 @@ class TopicService
         }
         return $out;
     }
+    
+    public static function update($id, array $data)
+    {
+        if (empty($id) || !ctype_digit(strval($id)))
+        {
+            return self::fail("invalid id");
+        }
+        if (!isset($data['title']) || !isset($data['detail']))
+        {
+            return self::fail("lack of title or detail");
+        }
+        $title = trim($data['title']);
+        $detail = trim($data['detail']);
+        if (empty($data['title']) || empty($data['detail']))
+        {
+            return self::fail("empty title or detail");
+        }
+        $tags = [];
+        if (isset($data['tags']))
+        {
+            if (!is_array($data['tags']))
+            {
+                return self::fail("tags should be array");
+            }
+            $tags = $data['tags'];
+        }
+        $topicModel = Topic::model();
+        $detailModel = TopicDetail::model();
+        $detailTableName = $detailModel->tableName();
+        
+        $topicModel->beginTransaction();
+        try
+        {
+            $topicModel->update(
+                ['title' => ':title', 'update_time' => ':update_time'], 
+                ['id' => ':id'], 
+                [':title' => $title, ':update_time' => $_SERVER['REQUEST_TIME'], ':id' => $id]
+            );
+            $detailSql = "INSERT INTO $detailTableName VALUES (null, $id, '$detail') ON DUPLICATE KEY UPDATE content = '$detail'"; 
+            $detailModel->execute($detailSql);
+            if (!empty($tags))
+            {
+                list($err, $newTags) = TagService::insertGetInfo($tags);
+                if (!is_null($err))
+                {
+                    $topicModel->rollBack();
+                    return self::fail($err->msg);
+                }
+                list($err, $correlateTagsResult) = self::correlateTags($id, array_keys($newTags));
+                if (!is_null($err))
+                {
+                    $topicModel->rollBack();
+                    return self::fail($err->msg);
+                }
+            }
+            $topicModel->commit();
+            return self::success(true);
+        }
+        catch (\Exception $e)
+        {
+            $topicModel->rollBack();
+            return self::fail($e, $data);
+        }
+    }
+    
+    public static function correlateTags($topicId, array $tagIdArr)
+    {
+        $model = TagTopic::model();
+        $tableName = $model->tableName();
+        $model->beginTransaction();
+        try
+        {
+            $model->delete(['topic_id' => $topicId]);
+            if (!empty($tagIdArr))
+            {
+                $insertSql = "INSERT INTO $tableName VALUES ";
+                foreach ($tagIdArr as $tagId)
+                {
+                    $insertSql .= "(null, $topicId, $tagId),";
+                }
+                $insertSql = rtrim($insertSql, ',');
+                $model->execute($insertSql);
+            }
+            $model->commit();
+            return self::success(true);
+        }
+        catch (\Exception $e)
+        {
+            $model->rollBack();
+            return self::fail($e);
+        }
+    }
+    
 }

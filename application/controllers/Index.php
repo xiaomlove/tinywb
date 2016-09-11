@@ -5,6 +5,7 @@ use services\TopicService;
 use services\StatService;
 use services\TagService;
 use providers\AsyncTaskProvider;
+use framework\Validator;
 use framework\db\DB;
 
 class Index extends Common
@@ -257,13 +258,14 @@ class Index extends Common
         }
         
         $topicDetail = TopicService::getDetail($id);
+        $editLink = '<a href="' . url('controllers\Index@edit', ['id' => $id]) . '">[编辑]</a>';
         if (empty($topicDetail))
         {
-            $topicInfo['content'] = '还没有内容哟~.~<a href="' . url('controllers\Index@edit', ['id' => $id]) . '">[编辑]</a>';
+            $topicInfo['content'] = '还没有内容哟~.~' . $editLink;
         }
         else
         {
-            $topicInfo['content'] = $topicDetail['content'];
+            $topicInfo['content'] = $topicDetail . $editLink;
         }
         
         $topicTags = TopicService::getTags($id);
@@ -344,6 +346,35 @@ class Index extends Common
     
     public function editSubmit($id)
     {
-        dump($_POST);
+        if (empty($id) || !ctype_digit($id))
+        {
+            return $this->showInvalidParam();
+        }
+        $data = $this->request->getParam();
+        $validator = Validator::make($data, [
+            'title' => 'required|max_length:20|min_length:5',
+            'detail' => 'required|max_length:100|min_length:10',
+            'tags' => 'required|max_counts:5',
+            //'tags.*' => 'positive_integer',
+        ],[
+            'required' => ':attr不能少的哟亲',
+            'max_length' => '太长了，:attr最多只能是:target个字符',
+            'min_length' => '太短了，:attr最少都得:target个字符',
+        ], [
+            'title' => '标题',
+            'detail' => '内容'
+        ], false);
+        
+        var_dump($validator->getError());
+        die;
+        list($err, $result) = TopicService::update($id, $data);
+        if (!is_null($err))
+        {
+            dump($err);
+        }
+        else 
+        {
+            dump('ok');
+        }
     }
 }
