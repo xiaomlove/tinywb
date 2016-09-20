@@ -354,8 +354,7 @@ class Index extends Common
         $validator = Validator::make($data, [
             'title' => 'required|max_length:20|min_length:5',
             'detail' => 'required|max_length:100|min_length:10',
-            'tags' => 'required|max_counts:5',
-            //'tags.*' => 'positive_integer',
+            'tags' => 'max_counts:5',
         ],[
             'required' => ':attr不能少的哟亲',
             'max_length' => '太长了，:attr最多只能是:target个字符',

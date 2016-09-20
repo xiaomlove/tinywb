@@ -84,6 +84,11 @@ class Request
 		}
 	}
 	
+	public function isMethod($method)
+	{
+	    return $this->getMethod() === strtoupper($method);
+	}
+	
 	public function getParam($name = null, $default = null)
 	{
 	    if (is_null($name)) {

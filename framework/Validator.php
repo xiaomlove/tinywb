@@ -31,7 +31,7 @@ class Validator
     
     private $errors = [];
     
-    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = true)
+    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = false)
     {
         if (empty($rules))
         {
@@ -89,24 +89,25 @@ class Validator
             throw new \InvalidArgumentException("invalid rule: $rule, method: $method is not exist");
         }
         
-        if ($rule === 'required')
-        {
-            $validateResult = call_user_func([$this, $method], $attr, $this->data);
-        }
-        elseif (!isset($this->data[$attr]))
+        $data = $this->getData($attr);
+            
+        if (is_null($data))
         {
             //没有值，直接不通过，也不分场景之类的了
             $validateResult = false;
         }
-        else 
+        else
         {
-            $validateResult = call_user_func([$this, $method], $this->data[$attr], $target);
+            $validateResult = call_user_func([$this, $method], $data, $target);
         }
         
         if (!$validateResult)
         {
             $message = $this->getErrorMessage($attr, $rule, $target);
-            $this->setError($attr, $message);
+            if (!empty($message))
+            {
+                $this->setError($attr, $message);
+            }
             return false;
         }
         else
@@ -115,9 +116,41 @@ class Validator
         }
     }
     
-    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = true)
+    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = false)
     {
         return new static($data, $rules, $customMessage, $customAttr, $bulk);
+    }
+    
+    private function getData($attr)
+    {
+        $attrKeyArr = explode('.', $attr);
+        $data = null;
+        foreach ($attrKeyArr as $attrKey)
+        {
+            if (is_null($data))
+            {
+                if (isset($this->data[$attrKey]))
+                {
+                    $data = $this->data[$attrKey];
+                }
+                else 
+                {
+                    return null;
+                }
+            }
+            else 
+            {
+                if (isset($data[$attrKey]))
+                {
+                    $data = $data[$attrKey];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+        return $data;
     }
     
     private function getErrorMessage($attr, $rule, $target = '')
@@ -170,17 +203,9 @@ class Validator
         return isset($this->errors[$attr]) ? $this->errors[$attr] : '';
     }
     
-    
-    
     //必须
-    private function validate_required($attr, array $data)
+    private function validate_required($value)
     {
-        $attr = trim($attr);
-        if (!isset($data[$attr]))
-        {
-            return false;
-        }
-        $value = $data[$attr];
         if (is_string($value))
         {
             $value = trim($value);
