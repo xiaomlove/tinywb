@@ -107,18 +107,32 @@ class Validator
         }
     }
     
+    /**
+     * 便捷实例化方法
+     * @param array $data 待验证的数据
+     * @param array $rules 验证规则
+     * @param array $customMessage 自定义错误信息
+     * @param array $customAttr 自定义字段名
+     * @param integer $type 验证方式，有3种
+     * @return \framework\Validator 返回一个validator对象
+     */
+    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
+    {
+        return new static($data, $rules, $customMessage, $customAttr, $type);
+    }
+    
     private function doValidate($attr, $rule)
     {
         $target = '';
         foreach (self::$needTargetRule as $_rule)
         {
-            if (stripos($rule, $_rule) !== false)
+            if (stripos($rule, $_rule) === 0)
             {
                 //需要target
                 $ruleAndTarget = explode(':', $rule);
                 if (count($ruleAndTarget, true) !== 2)
                 {
-                    throw new \InvalidArgumentException("invalid rule: $rule, need target");
+                    throw new \InvalidArgumentException("invalid rule: $rule, need target and only one ':'");
                 }
                 $rule = $ruleAndTarget[0];
                 $target = $ruleAndTarget[1];
@@ -159,11 +173,6 @@ class Validator
         {
             return true;
         }
-    }
-    
-    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
-    {
-        return new static($data, $rules, $customMessage, $customAttr, $type);
     }
     
     private function getData($attr)
@@ -219,7 +228,11 @@ class Validator
         return str_replace([':attr', ':target'], [$attr, $target], $message);
     }
    
-    
+    /**
+     * 设置一个错误
+     * @param string $attr 字段名
+     * @param string $message 错误信息
+     */
     public function setError($attr, $message)
     {
         if (!isset($this->errors[$attr]))
@@ -230,6 +243,11 @@ class Validator
         
     }
     
+    /**
+     * 判断是否有错误，不传递$attr判断所有字段
+     * @param string $attr 字段名，有则判断这个字段是否有错误
+     * @return boolean
+     */
     public function hasError($attr = null)
     {
         if (is_null($attr))
@@ -239,6 +257,11 @@ class Validator
         return isset($this->errors[$attr]);
     }
     
+    /**
+     * 获取错误，不传递$attr获取所有字段 
+     * @param string $attr 字段名，有则取这个字段的所有错误
+     * @return string|array 有错误为数组，无错误为空字符串
+     */
     public function getError($attr = null)
     {
         if (is_null($attr))
@@ -246,6 +269,41 @@ class Validator
             return $this->errors;
         }
         return isset($this->errors[$attr]) ? $this->errors[$attr] : '';
+    }
+    
+    /**
+     * 获取第一个错误的字段名
+     * @return string
+     */
+    public function firstAttr()
+    {
+        if ($this->hasError())
+        {
+            $keys = array_keys($this->errors);
+            return $keys[0];
+        }
+        else
+        {
+            return '';
+        }
+    }
+    
+    /**
+     * 获取第一条错误信息
+     * @return string
+     */
+    public function firstMessage()
+    {
+        if ($this->hasError())
+        {
+            reset($this->errors);
+            $first = current($this->errors);
+            return $first[0];
+        }
+        else
+        {
+            return '';
+        }
     }
     
     //必须
@@ -364,7 +422,7 @@ class Validator
         }
         if (!isset($targetArr) || !is_array($targetArr))
         {
-            throw new \InvalidArgumentException("rule 'in' target invalid, not array, target: $target");
+            throw new \InvalidArgumentException("rule 'in' target invalid, should be array, such as [1,2], target: $target");
         }
         return in_array($value, $targetArr, true);
     }

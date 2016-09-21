@@ -362,8 +362,9 @@ class Index extends Common
         ], [
             'title' => '标题',
             'detail' => '内容'
-        ], 2);
+        ], 3);
         
+       // dump($validator->firstMessage());
         var_dump($validator->getError());
 
         die;
