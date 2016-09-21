@@ -31,7 +31,7 @@ class Validator
     const VALIDATE_TYPE_ALL_ERROR = 3;//验证完所有字段获得所有错误
     
     //需要目标值的规则
-    private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts', 'equal', 'equal_to', 'regular'];
+    private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts', 'equal', 'equal_to', 'regular', 'in'];
     
     private $data = [];
     
@@ -366,6 +366,6 @@ class Validator
         {
             throw new \InvalidArgumentException("rule 'in' target invalid, not array, target: $target");
         }
-        return in_array($value, $targetArr);
+        return in_array($value, $targetArr, true);
     }
 }
