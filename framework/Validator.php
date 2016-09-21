@@ -8,18 +8,30 @@ class Validator
         'required' => ':attr为必填项',
         'number' => ':attr必须是数字',
         'positive_integer' => ':attr必须为正整数',
+        'email' => ':attr不是合法的邮箱格式',
+        'ip' => ':attr必须是合法的IP格式',
+        'equal' => ':attr的值必须为:target',
+        'equal_to' => ':attr的值必须跟:target的值相等',
+        'regular' => ':attr值非法',
+        'url' => ':attr不是合理的URL格式',
+        'phone' => ':attr不是合理的手机格式',
+        'in' => ':attr的值只能是:target中的某个',
         'max' => ':attr的最大值是:target',
         'min' => ':attr的最小值是:target',
         'max_length' => ':attr最大长度不能超过:target',
         'min_length' => ':attr最小长度不能小于:target',
-        'email' => ':attr必须是合法的邮箱格式',
-        'ip' => ':attr必须是合法的IP格式',
         'max_counts' => ':attr个数不能超过:target',
         'min_counts' => ':attr个数不能少于:target',
     ];
+
+    const VALIDATE_TYPE_ONE_ERROR = 1;//任何一个字段出现错误即停止
+
+    const VALIDATE_TYPE_ONE_ATTR = 2;//每个字段只获取一个错误
+
+    const VALIDATE_TYPE_ALL_ERROR = 3;//验证完所有字段获得所有错误
     
     //需要目标值的规则
-    private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts'];
+    private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts', 'equal', 'equal_to', 'regular'];
     
     private $data = [];
     
@@ -31,7 +43,7 @@ class Validator
     
     private $errors = [];
     
-    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = false)
+    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
     {
         if (empty($rules))
         {
@@ -49,15 +61,45 @@ class Validator
             $ruleArr = explode('|', $ruleStr);//多个规则
             foreach ($attrArr as $attr)
             {
-                if (!$bulk && $this->hasError($attr))
+                switch ($type)
                 {
-                    continue;
+                    case self::VALIDATE_TYPE_ONE_ERROR:
+                        if ($this->hasError())
+                        {
+                            return;
+                        }
+                        break;
+                    case self::VALIDATE_TYPE_ONE_ATTR:
+                        if ($this->hasError($attr))
+                        {
+                            continue 2;
+                        }
+                        break;
+                    case self::VALIDATE_TYPE_ALL_ERROR:
+                        break;
+                    default:
+                        throw new \InvalidArgumentException("Invalid type: $type");
                 }
                 foreach ($ruleArr as $rule)
                 {
-                    if (!$bulk && $this->hasError($attr))
+                    switch ($type)
                     {
-                        continue;
+                        case self::VALIDATE_TYPE_ONE_ERROR:
+                            if ($this->hasError())
+                            {
+                                return;
+                            }
+                            break;
+                        case self::VALIDATE_TYPE_ONE_ATTR:
+                            if ($this->hasError($attr))
+                            {
+                                continue 2;
+                            }
+                            break;
+                        case self::VALIDATE_TYPE_ALL_ERROR:
+                            break;
+                        default:
+                            throw new \InvalidArgumentException("Invalid type: $type");
                     }
                     $this->doValidate($attr, $rule);
                 }
@@ -108,7 +150,10 @@ class Validator
             {
                 $this->setError($attr, $message);
             }
-            return false;
+            else
+            {
+                throw new \RuntimeException("can't get errorMessage, attr: $attr, rule: $rule, target: $target");
+            }
         }
         else
         {
@@ -116,9 +161,9 @@ class Validator
         }
     }
     
-    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = false)
+    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
     {
-        return new static($data, $rules, $customMessage, $customAttr, $bulk);
+        return new static($data, $rules, $customMessage, $customAttr, $type);
     }
     
     private function getData($attr)
@@ -210,7 +255,7 @@ class Validator
         {
             $value = trim($value);
         }
-        return $value !== '';
+        return $value !== '' && !is_null($value);
     }
     
     //整数或数字字符串
@@ -240,13 +285,13 @@ class Validator
     //最大长度
     private function validate_max_length($value, $target)
     {
-        return is_numeric($target) && mb_strlen($value) <= $target;
+        return is_numeric($target) && mb_strlen($value, 'UTF-8') <= $target;
     }
     
     //最小长度
     private function validate_min_length($value, $target)
     {
-        return is_numeric($target) && mb_strlen($value) >= $target;
+        return is_numeric($target) && mb_strlen($value, 'UTF-8') >= $target;
     }
     
     //最大个数，针对数组
@@ -277,5 +322,50 @@ class Validator
     private function validate_ip($value)
     {
         return filter_var($value, FILTER_VALIDATE_IP) !== false;
+    }
+
+    //手机
+    private function validate_phone($value)
+    {
+        return preg_match('/^(13|15|18|14|17)[0-9]{9}$/', $value) > 0;
+    }
+
+    //equal
+    private function validate_equal($value, $target)
+    {
+        return $value == $target;
+    }
+
+    //equal_to
+    private function validate_equal_to($value, $target)
+    {
+        $targetValue = $this->getData($target);
+        return $value == $targetValue;
+    }
+
+    //regular
+    private function validate_regular($value, $target)
+    {
+        $isRegularValid = @preg_match($target, null) !== false;//正则是否合法
+        if (!$isRegularValid)
+        {
+            throw new \InvalidArgumentException("Invalid regular: $target");
+        }
+        return preg_match($target, $value) > 0;
+    }
+
+    //in
+    private function validate_in($value, $target)
+    {
+        $evalResult = @eval('$targetArr = ' . $target . ';');
+        if ($evalResult === false)
+        {
+            throw new \InvalidArgumentException("rule 'in' target invalid, target: $target");
+        }
+        if (!isset($targetArr) || !is_array($targetArr))
+        {
+            throw new \InvalidArgumentException("rule 'in' target invalid, not array, target: $target");
+        }
+        return in_array($value, $targetArr);
     }
 }

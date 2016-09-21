@@ -354,7 +354,7 @@ class Index extends Common
         $validator = Validator::make($data, [
             'title' => 'required|max_length:20|min_length:5',
             'detail' => 'required|max_length:100|min_length:10',
-            'tags' => 'max_counts:5',
+            'title' => 'regular:/^[\d]+$/',
         ],[
             'required' => ':attr不能少的哟亲',
             'max_length' => '太长了，:attr最多只能是:target个字符',
@@ -362,9 +362,10 @@ class Index extends Common
         ], [
             'title' => '标题',
             'detail' => '内容'
-        ], false);
+        ], 2);
         
         var_dump($validator->getError());
+
         die;
         list($err, $result) = TopicService::update($id, $data);
         if (!is_null($err))
