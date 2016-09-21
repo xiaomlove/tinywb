@@ -11,7 +11,7 @@ use models\Tag;
 use models\TagTopic;
 use models\Stat;
 
-class TagService
+class TagService extends Service
 {
     public static function getById($id, $fields = '*')
     {
@@ -115,6 +115,55 @@ class TagService
             $out[$item['id']] = ['tag_id' => $item['id'], 'weigh' => $item['counts']];
         }
         return $out;
+    }
+    
+    /**
+     * 插入标签并获得插入后包括id在内的信息
+     * @param array $tagNames
+     * @return array
+     */
+    public static function insertGetInfo(array $tagNames)
+    {
+        if (empty($tagNames))
+        {
+            return self::fail("empty tagNames");
+        }
+        $tagNames = array_map('trim', $tagNames);
+        $tagNamesFlip = array_flip($tagNames);
+        $whereStr = '(';
+        foreach ($tagNames as $name)
+        {
+            $whereStr .= "'$name',";
+        }
+        reset($tagNames);
+        unset($name);
+        
+        $whereStr = rtrim($whereStr, ',') . ')';
+        $tagNameExists = Tag::model()->getList('*', ['name' => [$whereStr, 'IN']]);//已存在的标签
+        $out = [];
+        if (!empty($tagNameExists))
+        {
+            foreach ($tagNameExists as $row)
+            {
+                $out[$row['id']] = $row['name'];
+                unset($tagNamesFlip[$row['name']]);
+            }
+        }
+        if (!empty($tagNamesFlip))
+        {
+            //有新的标签要插入
+            $model = Tag::model();
+            foreach ($tagNamesFlip as $tagName => $index)
+            {
+                $insertResult = $model->insert([
+                    'name' => $tagName,
+                    'counts' => 0,
+                ]);
+                $id = $model->lastInsertId();
+                $out[$id] = $tagName;
+            }
+        }
+        return self::success($out);
     }
     
 }

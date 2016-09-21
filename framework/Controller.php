@@ -139,5 +139,14 @@ abstract class Controller
         var_dump($out);die;
         return new Response($out, $statusCode, $headers);
     }
+    
+    public function validate(array $data, array $rules, array $customMessage = [], array $customAttr = [], $bulk = false)
+    {
+        $validator = Validator::make($data, $rules, $customMessage, $customAttr, $bulk);
+        if ($validator->hasError())
+        {
+            
+        }
+    }
 }
 

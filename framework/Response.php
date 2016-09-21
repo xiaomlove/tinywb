@@ -172,7 +172,6 @@ class Response
         foreach ($this->headers as $name => $value) {
             header("$name: $value", false);
         }
-        die($this->content);
         echo $this->content;
         
         if (function_exists('fastcgi_finish_request')) {

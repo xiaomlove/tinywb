@@ -55,27 +55,27 @@ abstract class Model
     
     abstract function tableName();
     
-    protected function execute($sql, array $binds = [])
+    public function execute($sql, array $binds = [])
     {
         return $this->getDb()->execute($sql, $binds);
     }
     
-    protected function exec($sql)
+    public function exec($sql)
     {
         return $this->getDb()->exec($sql);
     }
     
-    protected function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    public function fetch($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
     {
         return $this->getDb()->fetch($sql, $binds, $fetcyStyle);
     }
     
-    protected function fetchAll($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
+    public function fetchAll($sql, array $binds = [], $fetcyStyle = \PDO::FETCH_ASSOC)
     {
         return $this->getDb()->fetchAll($sql, $binds, $fetcyStyle);
     }
     
-    protected function fetchColumn($sql, array $binds = [])
+    public function fetchColumn($sql, array $binds = [])
     {
         return $this->getDb()->fetchColumn($sql, $binds);
     }

@@ -21,4 +21,5 @@ class TagTopic extends Model
     {
         return $this->count(['tag_id' => $tagId]);
     }
+    
 }

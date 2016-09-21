@@ -15,6 +15,8 @@ class Route
     
     private static $routeMapsFlip = [];//用于生成URL
     
+    private static $routeRegistered = [];//用于判断是否已经注册，方法+url是唯一的
+    
     private static $methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
     
     private $matchedRoute;
@@ -40,11 +42,43 @@ class Route
         return self::add('PUT', $url, $controllerAction, $options);
     }
     
+    public static function match(array $methods, $url, $controllerAction, array $options = [])
+    {
+        foreach ($methods as $method)
+        {
+            self::add($method, $url, $controllerAction, $options);
+        }
+        return true;
+    }
+    
+    public static function any($url, $controllerAction, array $options = [])
+    {
+        return self::match(self::$methods, $url, $controllerAction, $options);
+    }
+    
+    public static function hasRegistered($url)
+    {
+        if (isset(self::$routeRegistered[$url]))
+        {
+            return self::$routeRegistered[$url];
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     private static function add($method, $url, $controllerAction, array $options = [])
     {
         $method = strtoupper($method);
-        if (!in_array($method, self::$methods)) {
+        if (!in_array($method, self::$methods)) 
+        {
             throw new \InvalidArgumentException("Invalid method: $method");
+        }
+        $registered = self::hasRegistered($url);
+        if (is_array($registered) && isset($registered[$method]))
+        {
+            throw new \RuntimeException("url: $url has registered: " . json_encode($registered[$method]));
         }
         $controllerAction = trim($controllerAction, '\\');
         $caArr = explode('@', $controllerAction);
@@ -57,6 +91,7 @@ class Route
         $level = $urlAndLevel['level'];
         self::$routeMaps[$method][$level][] = ['url' => $url, 'controller' => $caArr[0], 'action' => $caArr[1], 'options' => $options];
         self::$routeMapsFlip[$controllerAction][] = ['url' => $url, 'options' => $options];
+        self::$routeRegistered[$url][$method] = ['url' => $url, 'controllerAction' => $controllerAction, 'options' => $options];
         return true;
     }
     
