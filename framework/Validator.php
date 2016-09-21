@@ -146,11 +146,20 @@ class Validator
         }
         
         $data = $this->getData($attr);
-            
-        if (is_null($data))
+        
+        if (is_null($data) || $data === '')
         {
-            //没有值，直接不通过，也不分场景之类的了
-            $validateResult = false;
+            //没有值(空字符串当无值处理)。不考虑场景之类
+            if ($rule === 'required')
+            {
+                //是必须，直接不通过
+                $validateResult = false;
+            }
+            else 
+            {
+                //不是必须，直接通过。也即没有值不验证
+                $validateResult = true;
+            }
         }
         else
         {
