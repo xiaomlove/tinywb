@@ -355,7 +355,7 @@ class Index extends Common
         echo '<hr/>';
         $validator = Validator::make($data, [
             'title' => 'required|max_length:20|min_length:5|equal_to:detail',
-            'detail' => 'required|max_length:100|min_length:10',
+            'detail' => 'max_length:100|min_length:10',
         ],[
             'required' => ':attr不能少的哟亲',
             'max_length' => '太长了，:attr最多只能是:target个字符',
@@ -363,7 +363,7 @@ class Index extends Common
         ], [
             'title' => '标题',
             'detail' => '内容'
-        ], 3);
+        ]);
         
        // dump($validator->firstMessage());
         var_dump($validator->getError());

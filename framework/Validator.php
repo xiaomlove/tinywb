@@ -24,11 +24,16 @@ class Validator
         'min_counts' => ':attr个数不能少于:target',
     ];
 
-    const VALIDATE_TYPE_ONE_ERROR = 1;//任何一个字段出现错误即停止
+    const VALIDATE_ERROR_ONE = 1;//任何一个字段出现出现一个错误即停止
 
-    const VALIDATE_TYPE_ONE_ATTR = 2;//每个字段只获取一个错误
+    const VALIDATE_ERROR_ONE_ATTR = 2;//每个字段只获取一个错误
 
-    const VALIDATE_TYPE_ALL_ERROR = 3;//验证完所有字段获得所有错误
+    const VALIDATE_ERROR_ALL_ATTR = 3;//验证完所有字段获得所有错误
+    
+    
+    const VALIDATE_ATTR_WITH_VALUE = 1;//值不为空才验证，为空直接通过
+    
+    const VALIDATE_ATTR_WHETHER_VALUE = 2;//验证所有规则，无值直接不通过
     
     //需要目标值的规则
     private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts', 'equal', 'equal_to', 'regular', 'in'];
@@ -43,7 +48,7 @@ class Validator
     
     private $errors = [];
     
-    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
+    public function __construct(array $data, array $rules, array $customMessage = [], array $customAttr = [], $errorType = self::VALIDATE_ERROR_ONE_ATTR, $attrType = self::VALIDATE_ATTR_WITH_VALUE)
     {
         if (empty($rules))
         {
@@ -61,36 +66,36 @@ class Validator
             $ruleArr = explode('|', $ruleStr);//多个规则
             foreach ($attrArr as $attr)
             {
-                switch ($type)
+                switch ($errorType)
                 {
-                    case self::VALIDATE_TYPE_ONE_ERROR:
+                    case self::VALIDATE_ERROR_ONE:
                         if ($this->hasError())
                         {
                             return;
                         }
                         break;
-                    case self::VALIDATE_TYPE_ONE_ATTR:
+                    case self::VALIDATE_ERROR_ONE_ATTR:
                         if ($this->hasError($attr))
                         {
                             continue 2;
                         }
                         break;
-                    case self::VALIDATE_TYPE_ALL_ERROR:
+                    case self::VALIDATE_ERROR_ALL_ATTR:
                         break;
                     default:
-                        throw new \InvalidArgumentException("Invalid type: $type");
+                        throw new \InvalidArgumentException("Invalid errorType: $errorType");
                 }
                 foreach ($ruleArr as $rule)
                 {
-                    switch ($type)
+                    switch ($errorType)
                     {
-                        case self::VALIDATE_TYPE_ONE_ERROR:
+                        case self::VALIDATE_ERROR_ONE:
                             if ($this->hasError())
                             {
                                 return;
                             }
                             break;
-                        case self::VALIDATE_TYPE_ONE_ATTR:
+                        case self::VALIDATE_ERROR_ONE_ATTR:
                             if ($this->hasError($attr))
                             {
                                 continue 2;
@@ -99,9 +104,9 @@ class Validator
                         case self::VALIDATE_TYPE_ALL_ERROR:
                             break;
                         default:
-                            throw new \InvalidArgumentException("Invalid type: $type");
+                            throw new \InvalidArgumentException("Invalid errorType: $errorType");
                     }
-                    $this->doValidate($attr, $rule);
+                    $this->doValidate($attr, $rule, $attrType);
                 }
             }
         }
@@ -116,12 +121,12 @@ class Validator
      * @param integer $type 验证方式，有3种
      * @return \framework\Validator 返回一个validator对象
      */
-    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $type = self::VALIDATE_TYPE_ONE_ERROR)
+    public static function make(array $data, array $rules, array $customMessage = [], array $customAttr = [], $errorType = self::VALIDATE_ERROR_ONE_ATTR, $attrType = self::VALIDATE_ATTR_WITH_VALUE)
     {
-        return new static($data, $rules, $customMessage, $customAttr, $type);
+        return new static($data, $rules, $customMessage, $customAttr, $errorType, $attrType);
     }
     
-    private function doValidate($attr, $rule)
+    private function doValidate($attr, $rule, $attrType)
     {
         $target = '';
         foreach (self::$needTargetRule as $_rule)
@@ -150,15 +155,26 @@ class Validator
         if (is_null($data) || $data === '')
         {
             //没有值(空字符串当无值处理)。不考虑场景之类
-            if ($rule === 'required')
+            if ($attrType == self::VALIDATE_ATTR_WITH_VALUE)
             {
-                //是必须，直接不通过
+                //有值才验证。没有值，规则是必须，直接不通过。否则通过
+                if ($rule === 'required')
+                {
+                    $validateResult = false;
+                }
+                else 
+                {
+                    $validateResult = true;
+                }
+            }
+            elseif ($attrType == self::VALIDATE_ATTR_WHETHER_VALUE)
+            {
+                //无值也验证。无值，那当然不通过了
                 $validateResult = false;
             }
             else 
             {
-                //不是必须，直接通过。也即没有值不验证
-                $validateResult = true;
+                throw new \InvalidArgumentException("invalid attrType: $attrType");
             }
         }
         else
