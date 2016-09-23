@@ -101,7 +101,7 @@ class Validator
                                 continue 2;
                             }
                             break;
-                        case self::VALIDATE_TYPE_ALL_ERROR:
+                        case self::VALIDATE_ERROR_ALL_ATTR:
                             break;
                         default:
                             throw new \InvalidArgumentException("Invalid errorType: $errorType");
