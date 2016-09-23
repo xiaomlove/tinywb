@@ -449,6 +449,7 @@ class Validator
         {
             throw new \InvalidArgumentException("rule 'in' target invalid, should be array, such as [1,2], target: $target");
         }
+        $targetArr = array_map('strval', $targetArr);
         return in_array($value, $targetArr, true);
     }
 }
