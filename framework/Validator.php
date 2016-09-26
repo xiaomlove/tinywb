@@ -31,9 +31,9 @@ class Validator
     const VALIDATE_ERROR_ALL_ATTR = 3;//验证完所有字段获得所有错误
     
     
-    const VALIDATE_ATTR_WITH_VALUE = 1;//值不为空才验证，为空直接通过
+    const VALIDATE_ATTR_WITH_VALUE = 1;//有值才验证，值为空直接通过
     
-    const VALIDATE_ATTR_WHETHER_VALUE = 2;//验证所有规则，无值直接不通过
+    const VALIDATE_ATTR_WHETHER_VALUE = 2;//无论是否有值均验证，无值直接不通过
     
     //需要目标值的规则
     private static $needTargetRule = ['max', 'min', 'max_length', 'min_length', 'max_counts', 'min_counts', 'equal', 'equal_to', 'regular', 'in'];
@@ -234,7 +234,11 @@ class Validator
     
     private function getErrorMessage($attr, $rule, $target = '')
     {
-        if (isset($this->customMessage[$rule]))
+        if (isset($this->customMessage["{$attr}.{$rule}"]))
+        {
+            $message = $this->customMessage["{$attr}.{$rule}"];
+        }
+        elseif (isset($this->customMessage[$rule]))
         {
             $message = $this->customMessage[$rule];
         }
@@ -245,7 +249,7 @@ class Validator
         else
         {
             return false;
-        }            
+        }
         if (isset($this->customAttr[$attr]))
         {
             $attr = $this->customAttr[$attr];
